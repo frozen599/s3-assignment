@@ -1,6 +1,7 @@
 package main
 
 import (
+	"log"
 	"net/http"
 
 	"github.com/frozen599/s3-assignment/api/internal/config"
@@ -11,14 +12,23 @@ import (
 
 func main() {
 	r := chi.NewRouter()
-
 	cfg := config.NewConfig()
 
 	r.Use(middleware.Logger)
-
 	r.Use(middleware.Timeout(cfg.ReadTimeout))
 
 	r.Get("/", controller.HealthCheck)
 
-	http.ListenAndServe(cfg.Addr, r)
+	server := &http.Server{
+		Handler:      r,
+		Addr:         cfg.Addr,
+		ReadTimeout:  cfg.ReadTimeout,
+		WriteTimeout: cfg.WriteTimeout,
+		IdleTimeout:  cfg.IdleTimeout,
+	}
+
+	err := server.ListenAndServe()
+	if err != nil {
+		log.Fatal(err)
+	}
 }
