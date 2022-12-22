@@ -6,6 +6,8 @@ import (
 	"strconv"
 	"sync"
 	"time"
+
+	"github.com/joho/godotenv"
 )
 
 // Config struct for describe configuration of the app.
@@ -25,6 +27,15 @@ var (
 func NewConfig() *Config {
 	// Configuring config one time.
 	once.Do(func() {
+		curDir, err := os.Getwd()
+		if err != nil {
+			panic("cannot load current directory")
+		}
+
+		err = godotenv.Load(curDir + "/.env")
+		if err != nil {
+			panic(err)
+		}
 		// Server host (should be string):
 		host := os.Getenv("SERVER_HOST")
 		// Server port (should be int):
