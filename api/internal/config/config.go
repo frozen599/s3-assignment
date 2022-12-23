@@ -16,6 +16,11 @@ type Config struct {
 	ReadTimeout  time.Duration
 	WriteTimeout time.Duration
 	IdleTimeout  time.Duration
+	DBHost       string
+	DBPort       int
+	DBName       string
+	DBUser       string
+	DBPassword   string
 }
 
 var (
@@ -59,12 +64,30 @@ func NewConfig() *Config {
 			panic("wrong server idle timeout (check your .env)")
 		}
 
+		dbHost := os.Getenv("DB_HOST")
+
+		dbPort, err := strconv.Atoi(os.Getenv("DB_PORT"))
+		if err != nil {
+			panic("cannot convert db port")
+		}
+
+		dbName := os.Getenv("DB_NAME")
+
+		dbUser := os.Getenv("DB_USER")
+
+		dbPassword := os.Getenv("DB_PASSWORD")
+
 		// Set all variables to the config instance.
 		instance = &Config{
 			Addr:         fmt.Sprintf("%s:%d", host, port),
 			ReadTimeout:  time.Duration(readTimeout) * time.Second,
 			WriteTimeout: time.Duration(writeTimeout) * time.Second,
 			IdleTimeout:  time.Duration(idleTimeout) * time.Second,
+			DBHost:       dbHost,
+			DBPort:       dbPort,
+			DBName:       dbName,
+			DBUser:       dbUser,
+			DBPassword:   dbPassword,
 		}
 	})
 

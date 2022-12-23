@@ -1,0 +1,40 @@
+version: '3.9'
+
+services:
+  chi:
+    container_name: s3-chi
+    build:
+      context: .
+    ports:
+      -5000:5000
+    environment:
+      - DB_HOST=s3-postgres
+    networks:
+      - s3-network
+    depends_on:
+      - db
+
+  db:
+    container_name: s3-postgres
+    image: postgres
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=postgres
+    ports:
+      -5432:5432
+    volumes:
+      -pg_data:/var/lib/postgresql/data
+    networks:
+      - s3-network
+  
+  migration:
+    container_name: s3-migration
+    build:
+      context: .
+    command:
+      [
+
+      ]
+    networks:
+      - s3-network

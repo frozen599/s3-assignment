@@ -8,7 +8,9 @@ RUN go mod download
 COPY . .
 
 ENV CGO_ENABLED=0 GOOS=linux GOARCH=amd64
-RUN go build -ldflags="-s -w" -o apiserver ./cmd/friends/
+
+RUN go build -ldflags="-s -w" -o apiserver ./api/cmd/friends/
+RUN go install -tags 'postgres' github.com/golang-migrate/migrate/v4/cmd/migrate@latest
 
 FROM scratch
 
