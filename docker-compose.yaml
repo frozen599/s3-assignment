@@ -11,6 +11,7 @@ services:
       - DB_HOST=s3-postgres
     networks:
       - s3-network
+    entrypoint: /apiserver
     depends_on:
       - db
 
