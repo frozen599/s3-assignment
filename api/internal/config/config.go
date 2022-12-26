@@ -1,7 +1,9 @@
 package config
 
 import (
+	"database/sql"
 	"fmt"
+	"log"
 	"os"
 	"strconv"
 	"sync"
@@ -24,8 +26,9 @@ type Config struct {
 }
 
 var (
-	once     sync.Once // create sync.Once primitive
-	instance *Config   // create nil Config struct
+	once       sync.Once // create sync.Once primitive
+	instance   *Config   // create nil Config struct
+	dbInstance *sql.DB
 )
 
 // NewConfig function to prepare config variables from .env file and return config.
@@ -89,8 +92,18 @@ func NewConfig() *Config {
 			DBUser:       dbUser,
 			DBPassword:   dbPassword,
 		}
-	})
 
+	})
 	// Return configured config instance.
 	return instance
+}
+
+func InitDB(cfg *Config) *sql.DB {
+	connectionStr := fmt.Sprintf("postgres://%s:%s@%s:%d/%s?sslmode=disable", cfg.DBUser, cfg.DBPassword, cfg.DBHost, cfg.DBPort, cfg.DBName)
+	dbInstance, err := sql.Open("postgres", connectionStr)
+	if err != nil {
+		log.Fatal(err)
+		return nil
+	}
+	return dbInstance
 }

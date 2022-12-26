@@ -8,11 +8,14 @@ import (
 	"github.com/frozen599/s3-assignment/api/internal/controller"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
+	"github.com/volatiletech/sqlboiler/v4/boil"
 )
 
 func main() {
 	r := chi.NewRouter()
 	cfg := config.NewConfig()
+	db := config.InitDB(cfg)
+	boil.SetDB(db)
 
 	r.Use(middleware.Logger)
 	r.Use(middleware.Timeout(cfg.ReadTimeout))
