@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"net/http"
 
@@ -19,8 +18,6 @@ func main() {
 		panic("cannot establish connection to db")
 	}
 
-	fmt.Println(db)
-	fmt.Println(cfg)
 	r.Use(middleware.Logger)
 	r.Use(middleware.Timeout(cfg.ReadTimeout))
 
