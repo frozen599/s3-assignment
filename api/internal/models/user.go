@@ -6,8 +6,9 @@ import (
 
 type User struct {
 	ID           int
-	CreatedAt    time.Time
-	UpdatedAt    time.Time
 	Email        string
 	PasswordHash string
+	CreatedAt    time.Time
+	UpdatedAt    time.Time
+	DeletedAt    time.Time
 }
