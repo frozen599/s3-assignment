@@ -17,7 +17,6 @@ func main() {
 	if db == nil {
 		panic("cannot establish connection to db")
 	}
-	defer db.Close()
 
 	r.Use(middleware.Logger)
 	r.Use(middleware.Timeout(cfg.ReadTimeout))
