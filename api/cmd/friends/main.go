@@ -4,8 +4,8 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/frozen599/s3-assignment/api/internal/api/router"
 	"github.com/frozen599/s3-assignment/api/internal/config"
-	"github.com/frozen599/s3-assignment/api/internal/controller"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 )
@@ -17,11 +17,14 @@ func main() {
 	if db == nil {
 		panic("cannot establish connection to db")
 	}
+	defer db.Close()
 
 	r.Use(middleware.Logger)
 	r.Use(middleware.Timeout(cfg.ReadTimeout))
+	r.Use(middleware.Recoverer)
 
-	r.Get("/", controller.HealthCheck)
+	r.Mount("/", router.HealthCheckRouter())
+	r.Mount("/api/v1/friends", router.FriendRouter())
 
 	server := &http.Server{
 		Handler:      r,

@@ -40,7 +40,7 @@ docker.chi.build:
 docker.chi: docker.chi.build
 	docker run --rm -d \
 		--name s3-chi \
-		-p 5000:5000 \
+		-p 8000:8000 \
 		chi
 
 docker.postgres:
