@@ -4,16 +4,16 @@ import (
 	"encoding/json"
 	"net/http"
 
+	"github.com/frozen599/s3-assignment/api/internal/controller"
 	"github.com/frozen599/s3-assignment/api/internal/forms"
-	"github.com/frozen599/s3-assignment/api/internal/usescase"
 )
 
 type blockingHandler struct {
-	blockingUseCase usescase.BlockingUseCase
+	blockingController controller.BlockingController
 }
 
 func NewBlockingHandler() blockingHandler {
-	return blockingHandler{blockingUseCase: usescase.NewBlockingUseCase()}
+	return blockingHandler{blockingController: controller.NewBlockingController()}
 }
 
 func (h blockingHandler) BlockUpdate(w http.ResponseWriter, r *http.Request) {
@@ -24,7 +24,7 @@ func (h blockingHandler) BlockUpdate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = h.blockingUseCase.BlockUpdate(req.Requestor, req.Target)
+	err = h.blockingController.BlockUpdate(req.Requestor, req.Target)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return

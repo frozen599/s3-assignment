@@ -1,4 +1,4 @@
-package usescase
+package controller
 
 import (
 	"time"
@@ -8,20 +8,20 @@ import (
 	"github.com/frozen599/s3-assignment/api/internal/repository"
 )
 
-type FriendUseCase interface {
+type FriendController interface {
 	CreateFriendConnection(firsrUserEmail, secondUserEmail string) error
-	GetFriendList(email string) ([]models.Relationship, error)
-	GetMutualFriendList(firsrUserEmail, secondUserEmail string) ([]models.Relationship, error)
+	GetFriendList(email string) ([]models.User, error)
+	GetMutualFriendList(firsrUserEmail, secondUserEmail string) ([]models.User, error)
 }
 
-type friendUseCase struct {
+type friendController struct {
 }
 
-func NewFriendUseCase() FriendUseCase {
-	return friendUseCase{}
+func NewFriendController() FriendController {
+	return friendController{}
 }
 
-func (f friendUseCase) CreateFriendConnection(firstUserEmail, secondUserEmail string) error {
+func (f friendController) CreateFriendConnection(firstUserEmail, secondUserEmail string) error {
 	firstUser, err := repository.GetUserByEmail(firstUserEmail)
 	if err != nil {
 		return err
@@ -45,20 +45,28 @@ func (f friendUseCase) CreateFriendConnection(firstUserEmail, secondUserEmail st
 	return nil
 }
 
-func (f friendUseCase) GetFriendList(email string) ([]models.Relationship, error) {
+func (f friendController) GetFriendList(email string) ([]models.User, error) {
 	user, err := repository.GetUserByEmail(email)
 	if err != nil {
 		return nil, err
 	}
-
-	friendList, err := repository.GetFriendList(user.ID)
+	friendListRelationships, err := repository.GetFriendList(user.ID)
 	if err != nil {
 		return nil, err
 	}
-	return friendList, err
+
+	var friendIDs []int
+	for _, friend := range friendListRelationships {
+		friendIDs = append(friendIDs, friend.ID)
+	}
+	friends, err := repository.GetUserByIds(friendIDs)
+	if err != nil {
+		return nil, err
+	}
+	return friends, nil
 }
 
-func (f friendUseCase) GetMutualFriendList(firstUserEmail, secondUserEmail string) ([]models.Relationship, error) {
+func (f friendController) GetMutualFriendList(firstUserEmail, secondUserEmail string) ([]models.User, error) {
 	firstUser, err := repository.GetUserByEmail(firstUserEmail)
 	if err != nil {
 		return nil, err
@@ -76,7 +84,15 @@ func (f friendUseCase) GetMutualFriendList(firstUserEmail, secondUserEmail strin
 	if err != nil {
 		return nil, err
 	}
-
 	mutualFriendList := pkg.GetMutualFriendList(firstUserFriendList, secondUserFriendList)
-	return mutualFriendList, err
+
+	var friendIDs []int
+	for _, friend := range mutualFriendList {
+		friendIDs = append(friendIDs, friend.ID)
+	}
+	friends, err := repository.GetUserByIds(friendIDs)
+	if err != nil {
+		return nil, err
+	}
+	return friends, nil
 }

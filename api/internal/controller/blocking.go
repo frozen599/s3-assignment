@@ -1,4 +1,4 @@
-package usescase
+package controller
 
 import (
 	"time"
@@ -7,18 +7,18 @@ import (
 	"github.com/frozen599/s3-assignment/api/internal/repository"
 )
 
-type BlockingUseCase interface {
+type BlockingController interface {
 	BlockUpdate(requestor, target string) error
 }
 
-type blockingUseCase struct {
+type blockingController struct {
 }
 
-func NewBlockingUseCase() BlockingUseCase {
-	return blockingUseCase{}
+func NewBlockingController() BlockingController {
+	return blockingController{}
 }
 
-func (b blockingUseCase) BlockUpdate(requestor string, target string) error {
+func (b blockingController) BlockUpdate(requestor string, target string) error {
 	requestorUser, err := repository.GetUserByEmail(requestor)
 	if err != nil {
 		return err

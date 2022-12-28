@@ -4,16 +4,16 @@ import (
 	"encoding/json"
 	"net/http"
 
+	"github.com/frozen599/s3-assignment/api/internal/controller"
 	"github.com/frozen599/s3-assignment/api/internal/forms"
-	"github.com/frozen599/s3-assignment/api/internal/usescase"
 )
 
 type friendHandler struct {
-	friendUsecase usescase.FriendUseCase
+	friendController controller.FriendController
 }
 
 func NewFriendHanlder() friendHandler {
-	return friendHandler{friendUsecase: usescase.NewFriendUseCase()}
+	return friendHandler{friendController: controller.NewFriendController()}
 }
 
 func (h friendHandler) CreateFriendConnection(w http.ResponseWriter, r *http.Request) {
@@ -21,6 +21,12 @@ func (h friendHandler) CreateFriendConnection(w http.ResponseWriter, r *http.Req
 	err := json.NewDecoder(r.Body).Decode(&req)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	err = h.friendController.CreateFriendConnection(req.Friends[0], req.Friends[1])
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 

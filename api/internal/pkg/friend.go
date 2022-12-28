@@ -8,11 +8,10 @@ func GetMutualFriendList(list1, list2 []models.Relationship) []models.Relationsh
 	var ret []models.Relationship
 	for _, item1 := range list1 {
 		for _, item2 := range list2 {
-			if item2.ID == item2.ID {
+			if item1.ID == item2.ID {
 				ret = append(ret, item1)
 			}
 		}
 	}
-
 	return ret
 }

@@ -5,7 +5,7 @@ import (
 	"github.com/go-chi/chi/v5"
 )
 
-func NewBlockingRouter() chi.Router {
+func BlockingRouter() chi.Router {
 	r := chi.NewRouter()
 	blockingHandler := handler.NewBlockingHandler()
 	r.Post("/", blockingHandler.BlockUpdate)
