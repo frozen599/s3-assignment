@@ -12,7 +12,9 @@ func GetUserByEmail(email string) (*models.User, error) {
 		Model(&ret).
 		Where("email = ?", email).
 		Select()
-
+	if err == pg.ErrNoRows {
+		return nil, nil
+	}
 	return &ret, err
 }
 
