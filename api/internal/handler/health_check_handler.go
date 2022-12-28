@@ -1,7 +1,6 @@
 package handler
 
 import (
-	"fmt"
 	"net/http"
 )
 
@@ -13,6 +12,5 @@ func NewHealthCheckHandler() healthCheckHandler {
 }
 
 func (h healthCheckHandler) HealthCheck(w http.ResponseWriter, r *http.Request) {
-	fmt.Println("cccccc")
 	w.WriteHeader(200)
 }

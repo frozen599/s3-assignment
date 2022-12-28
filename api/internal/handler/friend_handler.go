@@ -6,6 +6,7 @@ import (
 
 	"github.com/frozen599/s3-assignment/api/internal/controller"
 	"github.com/frozen599/s3-assignment/api/internal/forms"
+	"github.com/frozen599/s3-assignment/api/internal/utils"
 )
 
 type friendHandler struct {
@@ -29,17 +30,7 @@ func (h friendHandler) CreateFriendConnection(w http.ResponseWriter, r *http.Req
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-
-	successResp := forms.Response{
-		Success: true,
-	}
-	respData, err := json.Marshal(&successResp)
-	if err != nil {
-		return
-	}
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
-	w.Write(respData)
+	utils.ResponseOk(w)
 }
 
 func (h friendHandler) GetFriendList(w http.ResponseWriter, r *http.Request) {
@@ -61,9 +52,7 @@ func (h friendHandler) GetFriendList(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		return
 	}
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
-	w.Write(respData)
+	utils.ResponseOkWithData(w, respData)
 }
 
 func (h friendHandler) GetMutualFriendList(w http.ResponseWriter, r *http.Request) {
@@ -81,12 +70,9 @@ func (h friendHandler) GetMutualFriendList(w http.ResponseWriter, r *http.Reques
 		Friends: []string{},
 		Count:   0,
 	}
-
 	respData, err := json.Marshal(&resp)
 	if err != nil {
 		return
 	}
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
-	w.Write(respData)
+	utils.ResponseOkWithData(w, respData)
 }

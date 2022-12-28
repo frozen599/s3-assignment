@@ -6,6 +6,7 @@ import (
 
 	"github.com/frozen599/s3-assignment/api/internal/controller"
 	"github.com/frozen599/s3-assignment/api/internal/forms"
+	"github.com/frozen599/s3-assignment/api/internal/utils"
 )
 
 type blockingHandler struct {
@@ -29,15 +30,5 @@ func (h blockingHandler) BlockUpdate(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-
-	successResp := forms.Response{
-		Success: true,
-	}
-	respData, err := json.Marshal(&successResp)
-	if err != nil {
-		return
-	}
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
-	w.Write(respData)
+	utils.ResponseOk(w)
 }

@@ -4,8 +4,8 @@ import (
 	"time"
 
 	"github.com/frozen599/s3-assignment/api/internal/models"
-	"github.com/frozen599/s3-assignment/api/internal/pkg"
 	"github.com/frozen599/s3-assignment/api/internal/repository"
+	"github.com/frozen599/s3-assignment/api/internal/utils"
 )
 
 type FriendController interface {
@@ -84,7 +84,7 @@ func (f friendController) GetMutualFriendList(firstUserEmail, secondUserEmail st
 	if err != nil {
 		return nil, err
 	}
-	mutualFriendList := pkg.GetMutualFriendList(firstUserFriendList, secondUserFriendList)
+	mutualFriendList := utils.GetMutualFriendList(firstUserFriendList, secondUserFriendList)
 
 	var friendIDs []int
 	for _, friend := range mutualFriendList {
