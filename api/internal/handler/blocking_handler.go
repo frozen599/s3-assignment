@@ -21,7 +21,7 @@ func (h blockingHandler) BlockUpdate(w http.ResponseWriter, r *http.Request) {
 	var req forms.BlockingRequest
 	err := json.NewDecoder(r.Body).Decode(&req)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		utils.ResponseError(w, http.StatusBadRequest, err)
 		return
 	}
 

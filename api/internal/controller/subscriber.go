@@ -12,18 +12,23 @@ type SubscriberController interface {
 }
 
 type subscriberController struct {
+	userRepo repository.UserRepository
+	relaRepo repository.RelationshipRepository
 }
 
 func NewSubscriberController() SubscriberController {
-	return subscriberController{}
+	return subscriberController{
+		userRepo: repository.NewUserRepository(),
+		relaRepo: repository.NewRelationshipRepository(),
+	}
 }
 
 func (s subscriberController) CreateSubScription(requestor, target string) error {
-	requestorUser, err := repository.GetUserByEmail(requestor)
+	requestorUser, err := s.userRepo.GetUserByEmail(requestor)
 	if err != nil {
 		return err
 	}
-	targetUser, err := repository.GetUserByEmail(target)
+	targetUser, err := s.userRepo.GetUserByEmail(target)
 	if err != nil {
 		return err
 	}
@@ -36,7 +41,7 @@ func (s subscriberController) CreateSubScription(requestor, target string) error
 		UpdatedAt:        time.Now(),
 	}
 
-	err = repository.CreateRelationship(blockingRelationShip)
+	err = s.relaRepo.CreateRelationship(blockingRelationShip)
 	if err != nil {
 		return err
 	}

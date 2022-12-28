@@ -6,7 +6,19 @@ import (
 	"github.com/go-pg/pg/v10"
 )
 
-func GetUserByEmail(email string) (*models.User, error) {
+type UserRepository interface {
+	GetUserByEmail(email string) (*models.User, error)
+	GetUserByIds(ids []int) ([]models.User, error)
+}
+
+type userRepository struct {
+}
+
+func NewUserRepository() UserRepository {
+	return userRepository{}
+}
+
+func (r userRepository) GetUserByEmail(email string) (*models.User, error) {
 	var ret models.User
 	err := config.GetDB().
 		Model(&ret).
@@ -18,7 +30,7 @@ func GetUserByEmail(email string) (*models.User, error) {
 	return &ret, err
 }
 
-func GetUserByIds(ids []int) ([]models.User, error) {
+func (r userRepository) GetUserByIds(ids []int) ([]models.User, error) {
 	var ret []models.User
 
 	err := config.GetDB().

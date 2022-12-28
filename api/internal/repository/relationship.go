@@ -6,7 +6,20 @@ import (
 	"github.com/go-pg/pg/v10"
 )
 
-func CreateRelationship(friendRelationship models.Relationship) error {
+type RelationshipRepository interface {
+	CreateRelationship(friendRelationship models.Relationship) error
+	GetFriendList(userID int) ([]models.Relationship, error)
+	CheckIfBlocking(userId, targetUserId int) (bool, error)
+}
+
+type relationshipRepository struct {
+}
+
+func NewRelationshipRepository() RelationshipRepository {
+	return relationshipRepository{}
+}
+
+func (r relationshipRepository) CreateRelationship(friendRelationship models.Relationship) error {
 	_, err := config.GetDB().
 		Model(&friendRelationship).
 		Insert()
@@ -17,7 +30,7 @@ func CreateRelationship(friendRelationship models.Relationship) error {
 	return nil
 }
 
-func GetFriendList(userID int) ([]models.Relationship, error) {
+func (r relationshipRepository) GetFriendList(userID int) ([]models.Relationship, error) {
 	var ret []models.Relationship
 	err := config.GetDB().
 		Model(&ret).
@@ -27,4 +40,18 @@ func GetFriendList(userID int) ([]models.Relationship, error) {
 		return nil, nil
 	}
 	return ret, err
+}
+
+func (r relationshipRepository) CheckIfBlocking(userId, targetUserId int) (bool, error) {
+	var rela models.Relationship
+	err := config.GetDB().
+		Model(&rela).
+		Where("user_id_1 = ? AND user_id_2 = ?", userId, targetUserId).
+		Limit(1).
+		Select()
+
+	if err != nil {
+		return false, err
+	}
+	return rela.ID != 0, err
 }

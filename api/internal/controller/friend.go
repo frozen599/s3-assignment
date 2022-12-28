@@ -15,18 +15,23 @@ type FriendController interface {
 }
 
 type friendController struct {
+	userRepo repository.UserRepository
+	relaRepo repository.RelationshipRepository
 }
 
 func NewFriendController() FriendController {
-	return friendController{}
+	return friendController{
+		userRepo: repository.NewUserRepository(),
+		relaRepo: repository.NewRelationshipRepository(),
+	}
 }
 
 func (f friendController) CreateFriendConnection(firstUserEmail, secondUserEmail string) error {
-	firstUser, err := repository.GetUserByEmail(firstUserEmail)
+	firstUser, err := f.userRepo.GetUserByEmail(firstUserEmail)
 	if err != nil {
 		return err
 	}
-	secondUser, err := repository.GetUserByEmail(secondUserEmail)
+	secondUser, err := f.userRepo.GetUserByEmail(secondUserEmail)
 	if err != nil {
 		return err
 	}
@@ -38,7 +43,7 @@ func (f friendController) CreateFriendConnection(firstUserEmail, secondUserEmail
 		CreatedAt:        time.Now(),
 		UpdatedAt:        time.Now(),
 	}
-	err = repository.CreateRelationship(friendRelationShip)
+	err = f.relaRepo.CreateRelationship(friendRelationShip)
 	if err != nil {
 		return err
 	}
@@ -46,11 +51,11 @@ func (f friendController) CreateFriendConnection(firstUserEmail, secondUserEmail
 }
 
 func (f friendController) GetFriendList(email string) ([]models.User, error) {
-	user, err := repository.GetUserByEmail(email)
+	user, err := f.userRepo.GetUserByEmail(email)
 	if err != nil {
 		return nil, err
 	}
-	friendListRelationships, err := repository.GetFriendList(user.ID)
+	friendListRelationships, err := f.relaRepo.GetFriendList(user.ID)
 	if err != nil {
 		return nil, err
 	}
@@ -59,7 +64,7 @@ func (f friendController) GetFriendList(email string) ([]models.User, error) {
 	for _, friend := range friendListRelationships {
 		friendIDs = append(friendIDs, friend.ID)
 	}
-	friends, err := repository.GetUserByIds(friendIDs)
+	friends, err := f.userRepo.GetUserByIds(friendIDs)
 	if err != nil {
 		return nil, err
 	}
@@ -67,20 +72,20 @@ func (f friendController) GetFriendList(email string) ([]models.User, error) {
 }
 
 func (f friendController) GetMutualFriendList(firstUserEmail, secondUserEmail string) ([]models.User, error) {
-	firstUser, err := repository.GetUserByEmail(firstUserEmail)
+	firstUser, err := f.userRepo.GetUserByEmail(firstUserEmail)
 	if err != nil {
 		return nil, err
 	}
-	secondUser, err := repository.GetUserByEmail(secondUserEmail)
+	secondUser, err := f.userRepo.GetUserByEmail(secondUserEmail)
 	if err != nil {
 		return nil, err
 	}
 
-	firstUserFriendList, err := repository.GetFriendList(firstUser.ID)
+	firstUserFriendList, err := f.relaRepo.GetFriendList(firstUser.ID)
 	if err != nil {
 		return nil, err
 	}
-	secondUserFriendList, err := repository.GetFriendList(secondUser.ID)
+	secondUserFriendList, err := f.relaRepo.GetFriendList(secondUser.ID)
 	if err != nil {
 		return nil, err
 	}
@@ -90,7 +95,7 @@ func (f friendController) GetMutualFriendList(firstUserEmail, secondUserEmail st
 	for _, friend := range mutualFriendList {
 		friendIDs = append(friendIDs, friend.ID)
 	}
-	friends, err := repository.GetUserByIds(friendIDs)
+	friends, err := f.userRepo.GetUserByIds(friendIDs)
 	if err != nil {
 		return nil, err
 	}

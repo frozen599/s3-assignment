@@ -12,18 +12,23 @@ type BlockingController interface {
 }
 
 type blockingController struct {
+	userRepo repository.UserRepository
+	relaRepo repository.RelationshipRepository
 }
 
 func NewBlockingController() BlockingController {
-	return blockingController{}
+	return blockingController{
+		userRepo: repository.NewUserRepository(),
+		relaRepo: repository.NewRelationshipRepository(),
+	}
 }
 
 func (b blockingController) BlockUpdate(requestor string, target string) error {
-	requestorUser, err := repository.GetUserByEmail(requestor)
+	requestorUser, err := b.userRepo.GetUserByEmail(requestor)
 	if err != nil {
 		return err
 	}
-	targetUser, err := repository.GetUserByEmail(target)
+	targetUser, err := b.userRepo.GetUserByEmail(target)
 	if err != nil {
 		return err
 	}
@@ -36,7 +41,7 @@ func (b blockingController) BlockUpdate(requestor string, target string) error {
 		UpdatedAt:        time.Now(),
 	}
 
-	err = repository.CreateRelationship(blockingRelationShip)
+	err = b.relaRepo.CreateRelationship(blockingRelationShip)
 	if err != nil {
 		return err
 	}
