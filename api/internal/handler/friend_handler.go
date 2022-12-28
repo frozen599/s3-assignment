@@ -1,13 +1,22 @@
-package hanlder
+package handler
 
 import (
 	"encoding/json"
 	"net/http"
 
 	"github.com/frozen599/s3-assignment/api/internal/forms"
+	"github.com/frozen599/s3-assignment/api/internal/usescase"
 )
 
-func CreateFriendConnection(w http.ResponseWriter, r *http.Request) {
+type friendHandler struct {
+	friendUsecase usescase.FriendUseCase
+}
+
+func NewFriendHanlder() friendHandler {
+	return friendHandler{friendUsecase: usescase.NewFriendUseCase()}
+}
+
+func (h friendHandler) CreateFriendConnection(w http.ResponseWriter, r *http.Request) {
 	var req forms.CreateFriendRequest
 	err := json.NewDecoder(r.Body).Decode(&req)
 	if err != nil {
@@ -27,7 +36,7 @@ func CreateFriendConnection(w http.ResponseWriter, r *http.Request) {
 	w.Write(respData)
 }
 
-func GetFriendList(w http.ResponseWriter, r *http.Request) {
+func (h friendHandler) GetFriendList(w http.ResponseWriter, r *http.Request) {
 	var req forms.FriendListRequest
 	err := json.NewDecoder(r.Body).Decode(&req)
 	if err != nil {
@@ -51,7 +60,7 @@ func GetFriendList(w http.ResponseWriter, r *http.Request) {
 	w.Write(respData)
 }
 
-func GetMutualFriendList(w http.ResponseWriter, r *http.Request) {
+func (h friendHandler) GetMutualFriendList(w http.ResponseWriter, r *http.Request) {
 	var req forms.MutualFriendListRequest
 	err := json.NewDecoder(r.Body).Decode(&req)
 	if err != nil {

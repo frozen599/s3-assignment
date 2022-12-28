@@ -4,12 +4,14 @@ import (
 	"time"
 
 	"github.com/frozen599/s3-assignment/api/internal/models"
+	"github.com/frozen599/s3-assignment/api/internal/pkg"
 	"github.com/frozen599/s3-assignment/api/internal/repository"
 )
 
 type FriendUseCase interface {
 	CreateFriendConnection(firsrUserEmail, secondUserEmail string) error
 	GetFriendList(email string) ([]models.Relationship, error)
+	GetMutualFriendList(firsrUserEmail, secondUserEmail string) ([]models.Relationship, error)
 }
 
 type friendUseCase struct {
@@ -36,7 +38,7 @@ func (f friendUseCase) CreateFriendConnection(firstUserEmail, secondUserEmail st
 		CreatedAt:        time.Now(),
 		UpdatedAt:        time.Now(),
 	}
-	err = repository.CreateFriendConnection(friendRelationShip)
+	err = repository.CreateRelationship(friendRelationShip)
 	if err != nil {
 		return err
 	}
@@ -54,4 +56,27 @@ func (f friendUseCase) GetFriendList(email string) ([]models.Relationship, error
 		return nil, err
 	}
 	return friendList, err
+}
+
+func (f friendUseCase) GetMutualFriendList(firstUserEmail, secondUserEmail string) ([]models.Relationship, error) {
+	firstUser, err := repository.GetUserByEmail(firstUserEmail)
+	if err != nil {
+		return nil, err
+	}
+	secondUser, err := repository.GetUserByEmail(secondUserEmail)
+	if err != nil {
+		return nil, err
+	}
+
+	firstUserFriendList, err := repository.GetFriendList(firstUser.ID)
+	if err != nil {
+		return nil, err
+	}
+	secondUserFriendList, err := repository.GetFriendList(secondUser.ID)
+	if err != nil {
+		return nil, err
+	}
+
+	mutualFriendList := pkg.GetMutualFriendList(firstUserFriendList, secondUserFriendList)
+	return mutualFriendList, err
 }

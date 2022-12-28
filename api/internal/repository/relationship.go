@@ -6,7 +6,7 @@ import (
 	"github.com/go-pg/pg/v10"
 )
 
-func CreateFriendConnection(friendRelationship models.Relationship) error {
+func CreateRelationship(friendRelationship models.Relationship) error {
 	_, err := config.GetDB().
 		Model(&friendRelationship).
 		Insert()

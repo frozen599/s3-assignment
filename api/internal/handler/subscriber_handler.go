@@ -1,4 +1,4 @@
-package hanlder
+package handler
 
 import (
 	"encoding/json"
@@ -13,5 +13,4 @@ func CreateSubscription(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		return
 	}
-
 }

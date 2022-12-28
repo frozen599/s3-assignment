@@ -8,8 +8,9 @@ import (
 func FriendRouter() chi.Router {
 	r := chi.NewRouter()
 
-	r.Post("/", hanlder.CreateFriendConnection)
-	r.Post("/list", hanlder.GetFriendList)
+	friendHandler := handler.NewFriendHanlder()
+	r.Post("/", friendHandler.CreateFriendConnection)
+	r.Post("/list", friendHandler.GetFriendList)
 
 	return r
 }

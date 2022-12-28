@@ -5,9 +5,9 @@ import (
 	"github.com/go-chi/chi/v5"
 )
 
-func HealthCheckRouter() chi.Router {
+func NewBlockingRouter() chi.Router {
 	r := chi.NewRouter()
-	healthCheckHandler := handler.NewHealthCheckHandler()
-	r.Get("/", healthCheckHandler.HealthCheck)
+	blockingHandler := handler.NewBlockingHandler()
+	r.Post("/", blockingHandler.BlockUpdate)
 	return r
 }
