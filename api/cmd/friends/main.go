@@ -17,13 +17,16 @@ func main() {
 	if db == nil {
 		panic("cannot establish connection to db")
 	}
+	defer db.Close()
 
 	r.Use(middleware.Logger)
 	r.Use(middleware.Timeout(cfg.ReadTimeout))
 	r.Use(middleware.Recoverer)
 
-	r.Mount("/", router.HealthCheckRouter())
+	r.Mount("/health_check", router.HealthCheckRouter())
 	r.Mount("/api/v1/friends", router.FriendRouter())
+	r.Mount("api/v1/blocking", router.BlockingRouter())
+	r.Mount("api/v1/subscriber", router.SubscriberRouter())
 
 	server := &http.Server{
 		Handler:      r,
