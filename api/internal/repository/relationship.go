@@ -9,7 +9,8 @@ import (
 type RelationshipRepository interface {
 	CreateRelationship(friendRelationship models.Relationship) error
 	GetFriendList(userID int) ([]models.Relationship, error)
-	CheckIfBlocking(userId, targetUserId int) (bool, error)
+	CheckIfIsBlockingTarget(userId, targetUserId int) (bool, error)
+	CheckIfFriendConnectionExists(userID, targetUserID int) (bool, error)
 }
 
 type relationshipRepository struct {
@@ -42,16 +43,30 @@ func (r relationshipRepository) GetFriendList(userID int) ([]models.Relationship
 	return ret, err
 }
 
-func (r relationshipRepository) CheckIfBlocking(userId, targetUserId int) (bool, error) {
+func (r relationshipRepository) CheckIfIsBlockingTarget(userID, targetUserID int) (bool, error) {
 	var rela models.Relationship
 	err := config.GetDB().
 		Model(&rela).
-		Where("user_id_1 = ? AND user_id_2 = ?", userId, targetUserId).
+		Where("user_id_1 = ? AND user_id_2 = ?", userID, targetUserID).
 		Limit(1).
 		Select()
 
 	if err != nil {
 		return false, err
+	}
+	return rela.ID != 0, err
+}
+
+func (r relationshipRepository) CheckIfFriendConnectionExists(userID, targetUserID int) (bool, error) {
+	var rela models.Relationship
+	err := config.GetDB().
+		Model(&rela).
+		Where("user_id_1 = ? AND user_id_2 = ?", userID, targetUserID).
+		Limit(1).
+		Select()
+
+	if err == pg.ErrNoRows {
+		return false, nil
 	}
 	return rela.ID != 0, err
 }

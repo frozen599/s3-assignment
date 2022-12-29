@@ -23,12 +23,12 @@ func NewSubscriberController() SubscriberController {
 	}
 }
 
-func (s subscriberController) CreateSubScription(requestor, target string) error {
-	requestorUser, err := s.userRepo.GetUserByEmail(requestor)
+func (sc subscriberController) CreateSubScription(requestor, target string) error {
+	requestorUser, err := sc.userRepo.GetUserByEmail(requestor)
 	if err != nil {
 		return err
 	}
-	targetUser, err := s.userRepo.GetUserByEmail(target)
+	targetUser, err := sc.userRepo.GetUserByEmail(target)
 	if err != nil {
 		return err
 	}
@@ -41,7 +41,7 @@ func (s subscriberController) CreateSubScription(requestor, target string) error
 		UpdatedAt:        time.Now(),
 	}
 
-	err = s.relaRepo.CreateRelationship(blockingRelationShip)
+	err = sc.relaRepo.CreateRelationship(blockingRelationShip)
 	if err != nil {
 		return err
 	}

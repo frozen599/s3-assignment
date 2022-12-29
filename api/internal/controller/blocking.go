@@ -23,12 +23,12 @@ func NewBlockingController() BlockingController {
 	}
 }
 
-func (b blockingController) BlockUpdate(requestor string, target string) error {
-	requestorUser, err := b.userRepo.GetUserByEmail(requestor)
+func (bc blockingController) BlockUpdate(requestor string, target string) error {
+	requestorUser, err := bc.userRepo.GetUserByEmail(requestor)
 	if err != nil {
 		return err
 	}
-	targetUser, err := b.userRepo.GetUserByEmail(target)
+	targetUser, err := bc.userRepo.GetUserByEmail(target)
 	if err != nil {
 		return err
 	}
@@ -41,7 +41,7 @@ func (b blockingController) BlockUpdate(requestor string, target string) error {
 		UpdatedAt:        time.Now(),
 	}
 
-	err = b.relaRepo.CreateRelationship(blockingRelationShip)
+	err = bc.relaRepo.CreateRelationship(blockingRelationShip)
 	if err != nil {
 		return err
 	}

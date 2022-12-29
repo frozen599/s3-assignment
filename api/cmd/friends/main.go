@@ -25,8 +25,8 @@ func main() {
 
 	r.Mount("/health_check", router.HealthCheckRouter())
 	r.Mount("/api/v1/friends", router.FriendRouter())
-	r.Mount("api/v1/blocking", router.BlockingRouter())
-	r.Mount("api/v1/subscriber", router.SubscriberRouter())
+	r.Mount("/api/v1/blocking", router.BlockingRouter())
+	r.Mount("/api/v1/subscriber", router.SubscriberRouter())
 
 	server := &http.Server{
 		Handler:      r,

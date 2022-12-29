@@ -26,14 +26,30 @@ func NewFriendController() FriendController {
 	}
 }
 
-func (f friendController) CreateFriendConnection(firstUserEmail, secondUserEmail string) error {
-	firstUser, err := f.userRepo.GetUserByEmail(firstUserEmail)
+func (fc friendController) CreateFriendConnection(firstUserEmail, secondUserEmail string) error {
+	firstUser, err := fc.userRepo.GetUserByEmail(firstUserEmail)
 	if err != nil {
 		return err
 	}
-	secondUser, err := f.userRepo.GetUserByEmail(secondUserEmail)
+	secondUser, err := fc.userRepo.GetUserByEmail(secondUserEmail)
 	if err != nil {
 		return err
+	}
+
+	existedFriendship, err := fc.relaRepo.CheckIfFriendConnectionExists(firstUser.ID, secondUser.ID)
+	if err != nil {
+		return err
+	}
+	if existedFriendship {
+		return utils.ErrFriendshipAlreadyExists
+	}
+
+	isBlockingTarget, err := fc.relaRepo.CheckIfIsBlockingTarget(firstUser.ID, secondUser.ID)
+	if err != nil {
+		return err
+	}
+	if isBlockingTarget {
+		return utils.ErrCurrentUserIsBlockingTarget
 	}
 
 	friendRelationShip := models.Relationship{
@@ -43,19 +59,19 @@ func (f friendController) CreateFriendConnection(firstUserEmail, secondUserEmail
 		CreatedAt:        time.Now(),
 		UpdatedAt:        time.Now(),
 	}
-	err = f.relaRepo.CreateRelationship(friendRelationShip)
+	err = fc.relaRepo.CreateRelationship(friendRelationShip)
 	if err != nil {
 		return err
 	}
 	return nil
 }
 
-func (f friendController) GetFriendList(email string) ([]models.User, error) {
-	user, err := f.userRepo.GetUserByEmail(email)
+func (fc friendController) GetFriendList(email string) ([]models.User, error) {
+	user, err := fc.userRepo.GetUserByEmail(email)
 	if err != nil {
 		return nil, err
 	}
-	friendListRelationships, err := f.relaRepo.GetFriendList(user.ID)
+	friendListRelationships, err := fc.relaRepo.GetFriendList(user.ID)
 	if err != nil {
 		return nil, err
 	}
@@ -64,7 +80,7 @@ func (f friendController) GetFriendList(email string) ([]models.User, error) {
 	for _, friend := range friendListRelationships {
 		friendIDs = append(friendIDs, friend.ID)
 	}
-	friends, err := f.userRepo.GetUserByIds(friendIDs)
+	friends, err := fc.userRepo.GetUserByIds(friendIDs)
 	if err != nil {
 		return nil, err
 	}
