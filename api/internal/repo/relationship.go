@@ -1,4 +1,4 @@
-package repository
+package repo
 
 import (
 	"github.com/frozen599/s3-assignment/api/internal/config"
@@ -6,7 +6,7 @@ import (
 	"github.com/go-pg/pg/v10"
 )
 
-type RelationshipRepository interface {
+type IRelationshipRepo interface {
 	CreateRelationship(friendRelationship models.Relationship) error
 	GetFriendList(userID int) ([]models.Relationship, error)
 	CheckIfIsBlockingTarget(userId, targetUserId int) (bool, error)
@@ -14,14 +14,12 @@ type RelationshipRepository interface {
 	CanReceiveUpdate(userID int) ([]models.Relationship, error)
 }
 
-type relationshipRepository struct {
+type relationshipRepo struct {
 }
 
-func NewRelationshipRepository() RelationshipRepository {
-	return relationshipRepository{}
-}
+var RelationshipRepo IRelationshipRepo = relationshipRepo{}
 
-func (r relationshipRepository) CreateRelationship(friendRelationship models.Relationship) error {
+func (relationshipRepo) CreateRelationship(friendRelationship models.Relationship) error {
 	_, err := config.GetDB().
 		Model(&friendRelationship).
 		Insert()
@@ -32,7 +30,7 @@ func (r relationshipRepository) CreateRelationship(friendRelationship models.Rel
 	return nil
 }
 
-func (r relationshipRepository) GetFriendList(userID int) ([]models.Relationship, error) {
+func (relationshipRepo) GetFriendList(userID int) ([]models.Relationship, error) {
 	var ret []models.Relationship
 	err := config.GetDB().
 		Model(&ret).
@@ -44,7 +42,7 @@ func (r relationshipRepository) GetFriendList(userID int) ([]models.Relationship
 	return ret, err
 }
 
-func (r relationshipRepository) CheckIfIsBlockingTarget(userID, targetUserID int) (bool, error) {
+func (relationshipRepo) CheckIfIsBlockingTarget(userID, targetUserID int) (bool, error) {
 	var rela models.Relationship
 	err := config.GetDB().
 		Model(&rela).
@@ -58,7 +56,7 @@ func (r relationshipRepository) CheckIfIsBlockingTarget(userID, targetUserID int
 	return rela.ID != 0, err
 }
 
-func (r relationshipRepository) CheckIfFriendConnectionExists(userID, targetUserID int) (bool, error) {
+func (relationshipRepo) CheckIfFriendConnectionExists(userID, targetUserID int) (bool, error) {
 	var rela models.Relationship
 	err := config.GetDB().
 		Model(&rela).
@@ -72,7 +70,7 @@ func (r relationshipRepository) CheckIfFriendConnectionExists(userID, targetUser
 	return rela.ID != 0, err
 }
 
-func (r relationshipRepository) CanReceiveUpdate(userID int) ([]models.Relationship, error) {
+func (relationshipRepo) CanReceiveUpdate(userID int) ([]models.Relationship, error) {
 	var ret []models.Relationship
 	err := config.GetDB().
 		Model(&ret).

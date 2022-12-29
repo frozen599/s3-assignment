@@ -4,7 +4,7 @@ import (
 	"time"
 
 	"github.com/frozen599/s3-assignment/api/internal/models"
-	"github.com/frozen599/s3-assignment/api/internal/repository"
+	"github.com/frozen599/s3-assignment/api/internal/repo"
 )
 
 type BlockingController interface {
@@ -12,23 +12,18 @@ type BlockingController interface {
 }
 
 type blockingController struct {
-	userRepo repository.UserRepository
-	relaRepo repository.RelationshipRepository
 }
 
 func NewBlockingController() BlockingController {
-	return blockingController{
-		userRepo: repository.NewUserRepository(),
-		relaRepo: repository.NewRelationshipRepository(),
-	}
+	return blockingController{}
 }
 
 func (bc blockingController) BlockUpdate(requestor string, target string) error {
-	requestorUser, err := bc.userRepo.GetUserByEmail(requestor)
+	requestorUser, err := repo.UserRepo.GetUserByEmail(requestor)
 	if err != nil {
 		return err
 	}
-	targetUser, err := bc.userRepo.GetUserByEmail(target)
+	targetUser, err := repo.UserRepo.GetUserByEmail(target)
 	if err != nil {
 		return err
 	}
@@ -41,7 +36,7 @@ func (bc blockingController) BlockUpdate(requestor string, target string) error 
 		UpdatedAt:        time.Now(),
 	}
 
-	err = bc.relaRepo.CreateRelationship(blockingRelationShip)
+	err = repo.RelationshipRepo.CreateRelationship(blockingRelationShip)
 	if err != nil {
 		return err
 	}

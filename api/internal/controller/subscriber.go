@@ -4,7 +4,7 @@ import (
 	"time"
 
 	"github.com/frozen599/s3-assignment/api/internal/models"
-	"github.com/frozen599/s3-assignment/api/internal/repository"
+	"github.com/frozen599/s3-assignment/api/internal/repo"
 	"github.com/frozen599/s3-assignment/api/internal/utils"
 )
 
@@ -14,23 +14,18 @@ type SubscriberController interface {
 }
 
 type subscriberController struct {
-	userRepo repository.UserRepository
-	relaRepo repository.RelationshipRepository
 }
 
 func NewSubscriberController() SubscriberController {
-	return subscriberController{
-		userRepo: repository.NewUserRepository(),
-		relaRepo: repository.NewRelationshipRepository(),
-	}
+	return subscriberController{}
 }
 
 func (sc subscriberController) CreateSubScription(requestor, target string) error {
-	requestorUser, err := sc.userRepo.GetUserByEmail(requestor)
+	requestorUser, err := repo.UserRepo.GetUserByEmail(requestor)
 	if err != nil {
 		return err
 	}
-	targetUser, err := sc.userRepo.GetUserByEmail(target)
+	targetUser, err := repo.UserRepo.GetUserByEmail(target)
 	if err != nil {
 		return err
 	}
@@ -44,7 +39,7 @@ func (sc subscriberController) CreateSubScription(requestor, target string) erro
 			UpdatedAt:        time.Now(),
 		}
 
-		err = sc.relaRepo.CreateRelationship(blockingRelationShip)
+		err = repo.RelationshipRepo.CreateRelationship(blockingRelationShip)
 		if err != nil {
 			return err
 		}
@@ -54,19 +49,19 @@ func (sc subscriberController) CreateSubScription(requestor, target string) erro
 }
 
 func (sc subscriberController) CanReceiveUpdate(sender, text string) ([]string, error) {
-	senderUser, err := sc.userRepo.GetUserByEmail(sender)
+	senderUser, err := repo.UserRepo.GetUserByEmail(sender)
 	if err != nil {
 		return nil, err
 	}
 
 	mentionedEmail := utils.ParseEmail(text)[0]
-	mentionedUser, err := sc.userRepo.GetUserByEmail(mentionedEmail)
+	mentionedUser, err := repo.UserRepo.GetUserByEmail(mentionedEmail)
 	if err != nil {
 		return nil, err
 	}
 
 	if senderUser != nil {
-		relas, err := sc.relaRepo.CanReceiveUpdate(senderUser.ID)
+		relas, err := repo.RelationshipRepo.CanReceiveUpdate(senderUser.ID)
 		if err != nil {
 			return nil, err
 		}
@@ -74,7 +69,7 @@ func (sc subscriberController) CanReceiveUpdate(sender, text string) ([]string, 
 		for _, rela := range relas {
 			userIDs = append(userIDs, rela.UserID2)
 		}
-		users, err := sc.userRepo.GetUserByIDs(userIDs)
+		users, err := repo.UserRepo.GetUserByIDs(userIDs)
 		if err != nil {
 			return nil, err
 		}

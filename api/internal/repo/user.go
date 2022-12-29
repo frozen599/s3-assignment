@@ -1,4 +1,4 @@
-package repository
+package repo
 
 import (
 	"github.com/frozen599/s3-assignment/api/internal/config"
@@ -6,19 +6,17 @@ import (
 	"github.com/go-pg/pg/v10"
 )
 
-type UserRepository interface {
+type IUserRepo interface {
 	GetUserByEmail(email string) (*models.User, error)
 	GetUserByIDs(ids []int) ([]models.User, error)
 }
 
-type userRepository struct {
+type userRepo struct {
 }
 
-func NewUserRepository() UserRepository {
-	return userRepository{}
-}
+var UserRepo IUserRepo = userRepo{}
 
-func (r userRepository) GetUserByEmail(email string) (*models.User, error) {
+func (userRepo) GetUserByEmail(email string) (*models.User, error) {
 	var ret models.User
 	err := config.GetDB().
 		Model(&ret).
@@ -30,7 +28,7 @@ func (r userRepository) GetUserByEmail(email string) (*models.User, error) {
 	return &ret, err
 }
 
-func (r userRepository) GetUserByIDs(ids []int) ([]models.User, error) {
+func (userRepo) GetUserByIDs(ids []int) ([]models.User, error) {
 	var ret []models.User
 
 	err := config.GetDB().
