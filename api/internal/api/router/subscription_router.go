@@ -8,6 +8,7 @@ import (
 func SubscriberRouter() chi.Router {
 	r := chi.NewRouter()
 	subscriberHandler := handler.NewSubscriberHandler()
-	r.Get("/", subscriberHandler.CreateSubscription)
+	r.Post("/", subscriberHandler.CreateSubscription)
+	r.Post("/can-receive-update", subscriberHandler.CanReceiveUpdate)
 	return r
 }
