@@ -21,4 +21,6 @@ func (e ApiError) Error() string {
 var (
 	ErrFriendshipAlreadyExists     = NewApiError(100, "friendship already exists")
 	ErrCurrentUserIsBlockingTarget = NewApiError(101, "requestor is blocking target")
+	ErrUserNotFound                = NewApiError(102, "user not found")
+	ErrInvalidEmailFormat          = NewApiError(103, "invalid email format")
 )

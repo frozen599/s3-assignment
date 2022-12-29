@@ -2,6 +2,7 @@ package utils
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
 
@@ -9,31 +10,25 @@ import (
 )
 
 func ResponseOk(w http.ResponseWriter) {
-	w.WriteHeader(http.StatusOK)
 	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
 	successResp := forms.Response{
 		Success: true,
 	}
 	respData, err := json.Marshal(&successResp)
 	if err != nil {
 		log.Fatal(err)
-		w.Write(nil)
+		fmt.Fprintln(w, nil)
 		return
 	}
-	w.Write(respData)
-}
-
-func ResponseOkWithData(w http.ResponseWriter, data []byte) {
-	w.WriteHeader(http.StatusOK)
-	w.Header().Set("Content-Type", "application/json")
-	w.Write(data)
+	fmt.Fprintln(w, respData)
 }
 
 func ResponseError(w http.ResponseWriter, code int, err error) {
-	w.WriteHeader(code)
 	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(code)
 	resp := make(map[string]interface{})
-	resp["success"] = true
+	resp["success"] = false
 	resp["message"] = err.Error()
 	if code == http.StatusInternalServerError {
 		resp["message"] = "INTERNAL SERVER ERROR"
@@ -41,7 +36,7 @@ func ResponseError(w http.ResponseWriter, code int, err error) {
 	respData, err := json.Marshal(resp)
 	if err != nil {
 		log.Fatal(err)
-		w.Write(nil)
+		fmt.Fprintln(w, nil)
 	}
-	w.Write(respData)
+	fmt.Fprintln(w, respData)
 }

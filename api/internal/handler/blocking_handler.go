@@ -25,6 +25,12 @@ func (h blockingHandler) BlockUpdate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	isValidInput := utils.ValidateEmailInput([]string{req.Requestor, req.Target})
+	if !isValidInput {
+		utils.ResponseError(w, 103, utils.ErrInvalidEmailFormat)
+		return
+	}
+
 	err = h.blockingController.BlockUpdate(req.Requestor, req.Target)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)

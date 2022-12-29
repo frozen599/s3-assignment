@@ -2,6 +2,7 @@ package handler
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 
 	"github.com/frozen599/s3-assignment/api/internal/controller"
@@ -25,6 +26,12 @@ func (h friendHandler) CreateFriendConnection(w http.ResponseWriter, r *http.Req
 		return
 	}
 
+	isValidInput := utils.ValidateEmailInput([]string{req.Friends[0], req.Friends[1]})
+	if !isValidInput {
+		utils.ResponseError(w, 103, utils.ErrInvalidEmailFormat)
+		return
+	}
+
 	err = h.friendController.CreateFriendConnection(req.Friends[0], req.Friends[1])
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -41,18 +48,37 @@ func (h friendHandler) GetFriendList(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	isValidInput := utils.ValidateEmailInput([]string{req.Email})
+	if !isValidInput {
+		utils.ResponseError(w, 103, utils.ErrInvalidEmailFormat)
+		return
+	}
+
+	users, err := h.friendController.GetFriendList(req.Email)
+	if err != nil {
+		utils.ResponseError(w, http.StatusInternalServerError, err)
+		return
+	}
+	var emails []string
+	for _, user := range users {
+		emails = append(emails, user.Email)
+	}
+
 	resp := forms.FriendListResponse{
 		Response: forms.Response{
 			Success: true,
 		},
-		Friends: []string{},
-		Count:   0,
+		Friends: emails,
+		Count:   len(emails),
 	}
 	respData, err := json.Marshal(&resp)
 	if err != nil {
+		utils.ResponseError(w, http.StatusInternalServerError, err)
 		return
 	}
-	utils.ResponseOkWithData(w, respData)
+	w.WriteHeader(http.StatusOK)
+	w.Header().Set("Content-Type", "application/json")
+	fmt.Fprintln(w, respData)
 }
 
 func (h friendHandler) GetMutualFriendList(w http.ResponseWriter, r *http.Request) {
@@ -63,16 +89,35 @@ func (h friendHandler) GetMutualFriendList(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
+	isValidInput := utils.ValidateEmailInput([]string{req.Friends[0], req.Friends[1]})
+	if !isValidInput {
+		utils.ResponseError(w, 103, utils.ErrInvalidEmailFormat)
+		return
+	}
+
+	users, err := h.friendController.GetMutualFriendList(req.Friends[0], req.Friends[1])
+	if err != nil {
+		utils.ResponseError(w, http.StatusInternalServerError, err)
+		return
+	}
+	var emails []string
+	for _, user := range users {
+		emails = append(emails, user.Email)
+	}
+
 	resp := forms.FriendListResponse{
 		Response: forms.Response{
 			Success: true,
 		},
-		Friends: []string{},
-		Count:   0,
+		Friends: emails,
+		Count:   len(emails),
 	}
 	respData, err := json.Marshal(&resp)
 	if err != nil {
+		utils.ResponseError(w, http.StatusInternalServerError, err)
 		return
 	}
-	utils.ResponseOkWithData(w, respData)
+	w.WriteHeader(http.StatusOK)
+	w.Header().Set("Content-Type", "application/json")
+	fmt.Fprintln(w, respData)
 }

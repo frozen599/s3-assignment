@@ -80,7 +80,7 @@ func (fc friendController) GetFriendList(email string) ([]models.User, error) {
 	for _, friend := range friendListRelationships {
 		friendIDs = append(friendIDs, friend.ID)
 	}
-	friends, err := fc.userRepo.GetUserByIds(friendIDs)
+	friends, err := fc.userRepo.GetUserByIDs(friendIDs)
 	if err != nil {
 		return nil, err
 	}
@@ -111,7 +111,7 @@ func (f friendController) GetMutualFriendList(firstUserEmail, secondUserEmail st
 	for _, friend := range mutualFriendList {
 		friendIDs = append(friendIDs, friend.ID)
 	}
-	friends, err := f.userRepo.GetUserByIds(friendIDs)
+	friends, err := f.userRepo.GetUserByIDs(friendIDs)
 	if err != nil {
 		return nil, err
 	}

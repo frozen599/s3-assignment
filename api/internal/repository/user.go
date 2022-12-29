@@ -8,7 +8,7 @@ import (
 
 type UserRepository interface {
 	GetUserByEmail(email string) (*models.User, error)
-	GetUserByIds(ids []int) ([]models.User, error)
+	GetUserByIDs(ids []int) ([]models.User, error)
 }
 
 type userRepository struct {
@@ -30,7 +30,7 @@ func (r userRepository) GetUserByEmail(email string) (*models.User, error) {
 	return &ret, err
 }
 
-func (r userRepository) GetUserByIds(ids []int) ([]models.User, error) {
+func (r userRepository) GetUserByIDs(ids []int) ([]models.User, error) {
 	var ret []models.User
 
 	err := config.GetDB().

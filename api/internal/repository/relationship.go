@@ -11,6 +11,7 @@ type RelationshipRepository interface {
 	GetFriendList(userID int) ([]models.Relationship, error)
 	CheckIfIsBlockingTarget(userId, targetUserId int) (bool, error)
 	CheckIfFriendConnectionExists(userID, targetUserID int) (bool, error)
+	CanReceiveUpdate(userID int) ([]models.Relationship, error)
 }
 
 type relationshipRepository struct {
@@ -69,4 +70,19 @@ func (r relationshipRepository) CheckIfFriendConnectionExists(userID, targetUser
 		return false, nil
 	}
 	return rela.ID != 0, err
+}
+
+func (r relationshipRepository) CanReceiveUpdate(userID int) ([]models.Relationship, error) {
+	var ret []models.Relationship
+	err := config.GetDB().
+		Model(&ret).
+		Where("user_id_1 = ? AND relationship_type NOT IN (?)",
+			userID,
+			pg.In([]string{models.RelationshipTypeBlocking})).
+		Select()
+
+	if err == pg.ErrNoRows {
+		return nil, nil
+	}
+	return ret, err
 }
