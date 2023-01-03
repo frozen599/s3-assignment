@@ -36,7 +36,7 @@ func (fc friendController) CreateFriendConnection(firstUserEmail, secondUserEmai
 		return err
 	}
 
-	existedFriendship, err := repo.RelationshipRepo.CheckIfFriendConnectionExists(firstUser.ID, secondUser.ID)
+	existedFriendship, err := fc.relaRepo.CheckIfFriendConnectionExists(firstUser.ID, secondUser.ID)
 	if err != nil {
 		return err
 	}
@@ -44,7 +44,7 @@ func (fc friendController) CreateFriendConnection(firstUserEmail, secondUserEmai
 		return utils.ErrFriendshipAlreadyExists
 	}
 
-	isBlockingTarget, err := repo.RelationshipRepo.CheckIfIsBlockingTarget(firstUser.ID, secondUser.ID)
+	isBlockingTarget, err := fc.relaRepo.CheckIfIsBlockingTarget(firstUser.ID, secondUser.ID)
 	if err != nil {
 		return err
 	}

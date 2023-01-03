@@ -17,7 +17,7 @@ type relationshipRepo struct {
 	db *pg.DB
 }
 
-func NewRelationshipRepository(dbInstance *pg.DB) RelationshipRepo {
+func NewRelationshipRepo(dbInstance *pg.DB) RelationshipRepo {
 	return relationshipRepo{db: dbInstance}
 }
 
