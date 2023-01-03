@@ -1,24 +1,26 @@
 package repo
 
 import (
-	"github.com/frozen599/s3-assignment/api/internal/config"
 	"github.com/frozen599/s3-assignment/api/internal/models"
 	"github.com/go-pg/pg/v10"
 )
 
-type IUserRepo interface {
+type UserRepo interface {
 	GetUserByEmail(email string) (*models.User, error)
 	GetUserByIDs(ids []int) ([]models.User, error)
 }
 
 type userRepo struct {
+	db *pg.DB
 }
 
-var UserRepo IUserRepo = userRepo{}
+func NewUserRepo(dbInstance *pg.DB) UserRepo {
+	return userRepo{db: dbInstance}
+}
 
-func (userRepo) GetUserByEmail(email string) (*models.User, error) {
+func (r userRepo) GetUserByEmail(email string) (*models.User, error) {
 	var ret models.User
-	err := config.GetDB().
+	err := r.db.
 		Model(&ret).
 		Where("email = ?", email).
 		Select()
@@ -28,10 +30,10 @@ func (userRepo) GetUserByEmail(email string) (*models.User, error) {
 	return &ret, err
 }
 
-func (userRepo) GetUserByIDs(ids []int) ([]models.User, error) {
+func (r userRepo) GetUserByIDs(ids []int) ([]models.User, error) {
 	var ret []models.User
 
-	err := config.GetDB().
+	err := r.db.
 		Model(&ret).
 		Where("id IN (?)", pg.In(ids)).
 		Select()

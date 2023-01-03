@@ -14,8 +14,8 @@ type friendHandler struct {
 	friendController controller.FriendController
 }
 
-func NewFriendHanlder() friendHandler {
-	return friendHandler{friendController: controller.NewFriendController()}
+func NewFriendHanlder(friendController controller.FriendController) friendHandler {
+	return friendHandler{friendController: friendController}
 }
 
 func (h friendHandler) CreateFriendConnection(w http.ResponseWriter, r *http.Request) {

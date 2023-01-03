@@ -6,6 +6,7 @@ import (
 
 	"github.com/frozen599/s3-assignment/api/internal/api/router"
 	"github.com/frozen599/s3-assignment/api/internal/config"
+	"github.com/frozen599/s3-assignment/api/internal/repository"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 )
@@ -23,10 +24,13 @@ func main() {
 	r.Use(middleware.Timeout(cfg.ReadTimeout))
 	r.Use(middleware.Recoverer)
 
+	userRepo := repository.NewUserRepository(db)
+	relaRepo := repository.NewRelationshipRepository(db)
+
 	r.Mount("/health_check", router.HealthCheckRouter())
-	r.Mount("/api/v1/friends", router.FriendRouter())
-	r.Mount("/api/v1/blocking", router.BlockingRouter())
-	r.Mount("/api/v1/subscriber", router.SubscriberRouter())
+	r.Mount("/api/v1/friends", router.FriendRouter(userRepo, relaRepo))
+	r.Mount("/api/v1/blockings", router.BlockingRouter(userRepo, relaRepo))
+	r.Mount("/api/v1/subscribers", router.SubscriberRouter(userRepo, relaRepo))
 
 	server := &http.Server{
 		Handler:      r,

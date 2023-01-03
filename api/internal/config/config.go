@@ -106,10 +106,3 @@ func InitDB(cfg *Config) *pg.DB {
 	})
 	return dbInstance
 }
-
-func GetDB() *pg.DB {
-	if dbInstance == nil {
-		panic("must call InitDB first")
-	}
-	return dbInstance
-}

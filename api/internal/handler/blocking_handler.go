@@ -13,8 +13,8 @@ type blockingHandler struct {
 	blockingController controller.BlockingController
 }
 
-func NewBlockingHandler() blockingHandler {
-	return blockingHandler{blockingController: controller.NewBlockingController()}
+func NewBlockingHandler(blockingController controller.BlockingController) blockingHandler {
+	return blockingHandler{blockingController: blockingController}
 }
 
 func (h blockingHandler) BlockUpdate(w http.ResponseWriter, r *http.Request) {

@@ -14,8 +14,8 @@ type subscriberHandler struct {
 	subscriberController controller.SubscriberController
 }
 
-func NewSubscriberHandler() subscriberHandler {
-	return subscriberHandler{subscriberController: controller.NewSubscriberController()}
+func NewSubscriberHandler(subscriberController controller.SubscriberController) subscriberHandler {
+	return subscriberHandler{subscriberController: subscriberController}
 }
 
 func (h subscriberHandler) CreateSubscription(w http.ResponseWriter, r *http.Request) {

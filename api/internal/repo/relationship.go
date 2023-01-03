@@ -1,12 +1,11 @@
 package repo
 
 import (
-	"github.com/frozen599/s3-assignment/api/internal/config"
 	"github.com/frozen599/s3-assignment/api/internal/models"
 	"github.com/go-pg/pg/v10"
 )
 
-type IRelationshipRepo interface {
+type RelationshipRepo interface {
 	CreateRelationship(friendRelationship models.Relationship) error
 	GetFriendList(userID int) ([]models.Relationship, error)
 	CheckIfIsBlockingTarget(userId, targetUserId int) (bool, error)
@@ -15,12 +14,15 @@ type IRelationshipRepo interface {
 }
 
 type relationshipRepo struct {
+	db *pg.DB
 }
 
-var RelationshipRepo IRelationshipRepo = relationshipRepo{}
+func NewRelationshipRepository(dbInstance *pg.DB) RelationshipRepo {
+	return relationshipRepo{db: dbInstance}
+}
 
-func (relationshipRepo) CreateRelationship(friendRelationship models.Relationship) error {
-	_, err := config.GetDB().
+func (r relationshipRepo) CreateRelationship(friendRelationship models.Relationship) error {
+	_, err := r.db.
 		Model(&friendRelationship).
 		Insert()
 
@@ -30,9 +32,9 @@ func (relationshipRepo) CreateRelationship(friendRelationship models.Relationshi
 	return nil
 }
 
-func (relationshipRepo) GetFriendList(userID int) ([]models.Relationship, error) {
+func (r relationshipRepo) GetFriendList(userID int) ([]models.Relationship, error) {
 	var ret []models.Relationship
-	err := config.GetDB().
+	err := r.db.
 		Model(&ret).
 		Where("user_id_1 = ? AND relationship_type = ?", userID, models.RelationshipTypeFriend).
 		Select()
@@ -42,9 +44,9 @@ func (relationshipRepo) GetFriendList(userID int) ([]models.Relationship, error)
 	return ret, err
 }
 
-func (relationshipRepo) CheckIfIsBlockingTarget(userID, targetUserID int) (bool, error) {
+func (r relationshipRepo) CheckIfIsBlockingTarget(userID, targetUserID int) (bool, error) {
 	var rela models.Relationship
-	err := config.GetDB().
+	err := r.db.
 		Model(&rela).
 		Where("user_id_1 = ? AND user_id_2 = ?", userID, targetUserID).
 		Limit(1).
@@ -56,9 +58,9 @@ func (relationshipRepo) CheckIfIsBlockingTarget(userID, targetUserID int) (bool,
 	return rela.ID != 0, err
 }
 
-func (relationshipRepo) CheckIfFriendConnectionExists(userID, targetUserID int) (bool, error) {
+func (r relationshipRepo) CheckIfFriendConnectionExists(userID, targetUserID int) (bool, error) {
 	var rela models.Relationship
-	err := config.GetDB().
+	err := r.db.
 		Model(&rela).
 		Where("user_id_1 = ? AND user_id_2 = ?", userID, targetUserID).
 		Limit(1).
@@ -70,9 +72,9 @@ func (relationshipRepo) CheckIfFriendConnectionExists(userID, targetUserID int) 
 	return rela.ID != 0, err
 }
 
-func (relationshipRepo) CanReceiveUpdate(userID int) ([]models.Relationship, error) {
+func (r relationshipRepo) CanReceiveUpdate(userID int) ([]models.Relationship, error) {
 	var ret []models.Relationship
-	err := config.GetDB().
+	err := r.db.
 		Model(&ret).
 		Where("user_id_1 = ? AND relationship_type NOT IN (?)",
 			userID,
