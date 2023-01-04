@@ -106,11 +106,12 @@ func InitDB(cfg *Config) *pg.DB {
 		Database: cfg.DBName,
 		Addr:     fmt.Sprintf("%s:%d", cfg.DBHost, cfg.DBPort),
 	})
-
-	ctx := context.Background()
-	err := dbInstance.Ping(ctx)
-	if err != nil {
-		return nil
+	if dbInstance != nil {
+		ctx := context.Background()
+		err := dbInstance.Ping(ctx)
+		if err != nil {
+			return nil
+		}
 	}
 	return dbInstance
 }
