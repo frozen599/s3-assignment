@@ -4,8 +4,8 @@ import (
 	"time"
 
 	"github.com/frozen599/s3-assignment/api/internal/models"
+	"github.com/frozen599/s3-assignment/api/internal/pkg"
 	"github.com/frozen599/s3-assignment/api/internal/repo"
-	"github.com/frozen599/s3-assignment/api/internal/utils"
 )
 
 type SubscriberController interface {
@@ -50,7 +50,7 @@ func (sc subscriberController) CreateSubScription(requestor, target string) erro
 		}
 		return nil
 	}
-	return utils.ErrUserNotFound
+	return pkg.ErrUserNotFound
 }
 
 func (sc subscriberController) CanReceiveUpdate(sender, text string) ([]string, error) {
@@ -59,7 +59,7 @@ func (sc subscriberController) CanReceiveUpdate(sender, text string) ([]string, 
 		return nil, err
 	}
 
-	mentionedEmail := utils.ParseEmail(text)[0]
+	mentionedEmail := pkg.ParseEmail(text)[0]
 	mentionedUser, err := sc.userRepo.GetUserByEmail(mentionedEmail)
 	if err != nil {
 		return nil, err
@@ -87,5 +87,5 @@ func (sc subscriberController) CanReceiveUpdate(sender, text string) ([]string, 
 		}
 		return emails, nil
 	}
-	return nil, utils.ErrUserNotFound
+	return nil, pkg.ErrUserNotFound
 }

@@ -1,7 +1,9 @@
 package config
 
 import (
+	"context"
 	"fmt"
+	"log"
 	"os"
 	"strconv"
 	"sync"
@@ -36,41 +38,41 @@ func NewConfig() *Config {
 	once.Do(func() {
 		curDir, err := os.Getwd()
 		if err != nil {
-			panic("cannot load current directory")
+			log.Fatal("cannot load current directory")
 		}
 
 		err = godotenv.Load(curDir + "/.env")
 		if err != nil {
-			panic(err)
+			log.Fatal(err)
 		}
 		// Server host (should be string):
 		host := os.Getenv("SERVER_HOST")
 		// Server port (should be int):
 		port, err := strconv.Atoi(os.Getenv("SERVER_PORT"))
 		if err != nil {
-			panic("wrong server port (check your .env)")
+			log.Fatal("wrong server port (check your .env)")
 		}
 		// Server read timeout (should be int):
 		readTimeout, err := strconv.Atoi(os.Getenv("SERVER_READ_TIMEOUT"))
 		if err != nil {
-			panic("wrong server read timeout (check your .env)")
+			log.Fatal("wrong server read timeout (check your .env)")
 		}
 		// Server write timeout (should be int):
 		writeTimeout, err := strconv.Atoi(os.Getenv("SERVER_WRITE_TIMEOUT"))
 		if err != nil {
-			panic("wrong server write timeout (check your .env)")
+			log.Fatal("wrong server write timeout (check your .env)")
 		}
 		// Server idle timeout (should be int):
 		idleTimeout, err := strconv.Atoi(os.Getenv("SERVER_IDLE_TIMEOUT"))
 		if err != nil {
-			panic("wrong server idle timeout (check your .env)")
+			log.Fatal("wrong server idle timeout (check your .env)")
 		}
 
 		dbHost := os.Getenv("DB_HOST")
 
 		dbPort, err := strconv.Atoi(os.Getenv("DB_PORT"))
 		if err != nil {
-			panic("cannot convert db port")
+			log.Fatal("cannot convert db port")
 		}
 
 		dbName := os.Getenv("DB_NAME")
@@ -104,5 +106,11 @@ func InitDB(cfg *Config) *pg.DB {
 		Database: cfg.DBName,
 		Addr:     fmt.Sprintf("%s:%d", cfg.DBHost, cfg.DBPort),
 	})
+
+	ctx := context.Background()
+	err := dbInstance.Ping(ctx)
+	if err != nil {
+		return nil
+	}
 	return dbInstance
 }

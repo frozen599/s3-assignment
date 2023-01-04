@@ -7,7 +7,7 @@ import (
 
 	"github.com/frozen599/s3-assignment/api/internal/controller"
 	"github.com/frozen599/s3-assignment/api/internal/forms"
-	"github.com/frozen599/s3-assignment/api/internal/utils"
+	"github.com/frozen599/s3-assignment/api/internal/pkg"
 )
 
 type subscriberHandler struct {
@@ -26,9 +26,9 @@ func (h subscriberHandler) CreateSubscription(w http.ResponseWriter, r *http.Req
 		return
 	}
 
-	isValidInput := utils.ValidateEmailInput([]string{req.Requestor, req.Target})
+	isValidInput := pkg.ValidateEmailInput([]string{req.Requestor, req.Target})
 	if !isValidInput {
-		utils.ResponseError(w, 103, utils.ErrInvalidEmailFormat)
+		pkg.ResponseError(w, 103, pkg.ErrInvalidEmailFormat)
 		return
 	}
 
@@ -37,25 +37,25 @@ func (h subscriberHandler) CreateSubscription(w http.ResponseWriter, r *http.Req
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	utils.ResponseOk(w)
+	pkg.ResponseOk(w)
 }
 
 func (h subscriberHandler) CanReceiveUpdate(w http.ResponseWriter, r *http.Request) {
 	var req forms.CanReceiveUpdateRequest
 	err := json.NewDecoder(r.Body).Decode(&req)
 	if err != nil {
-		utils.ResponseError(w, http.StatusBadRequest, err)
+		pkg.ResponseError(w, http.StatusBadRequest, err)
 		return
 	}
-	isValidInput := utils.ValidateEmailInput([]string{req.Sender})
+	isValidInput := pkg.ValidateEmailInput([]string{req.Sender})
 	if !isValidInput {
-		utils.ResponseError(w, 103, utils.ErrInvalidEmailFormat)
+		pkg.ResponseError(w, 103, pkg.ErrInvalidEmailFormat)
 		return
 	}
 
 	emails, err := h.subscriberController.CanReceiveUpdate(req.Sender, req.Text)
 	if err != nil {
-		utils.ResponseError(w, http.StatusInternalServerError, err)
+		pkg.ResponseError(w, http.StatusInternalServerError, err)
 		return
 	}
 
@@ -67,7 +67,7 @@ func (h subscriberHandler) CanReceiveUpdate(w http.ResponseWriter, r *http.Reque
 	}
 	respData, err := json.Marshal(resp)
 	if err != nil {
-		utils.ResponseError(w, http.StatusInternalServerError, err)
+		pkg.ResponseError(w, http.StatusInternalServerError, err)
 		return
 	}
 	w.WriteHeader(http.StatusOK)

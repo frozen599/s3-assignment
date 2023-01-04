@@ -7,7 +7,7 @@ import (
 
 	"github.com/frozen599/s3-assignment/api/internal/controller"
 	"github.com/frozen599/s3-assignment/api/internal/forms"
-	"github.com/frozen599/s3-assignment/api/internal/utils"
+	"github.com/frozen599/s3-assignment/api/internal/pkg"
 )
 
 type friendHandler struct {
@@ -26,9 +26,9 @@ func (h friendHandler) CreateFriendConnection(w http.ResponseWriter, r *http.Req
 		return
 	}
 
-	isValidInput := utils.ValidateEmailInput([]string{req.Friends[0], req.Friends[1]})
+	isValidInput := pkg.ValidateEmailInput([]string{req.Friends[0], req.Friends[1]})
 	if !isValidInput {
-		utils.ResponseError(w, 103, utils.ErrInvalidEmailFormat)
+		pkg.ResponseError(w, 103, pkg.ErrInvalidEmailFormat)
 		return
 	}
 
@@ -37,7 +37,7 @@ func (h friendHandler) CreateFriendConnection(w http.ResponseWriter, r *http.Req
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	utils.ResponseOk(w)
+	pkg.ResponseOk(w)
 }
 
 func (h friendHandler) GetFriendList(w http.ResponseWriter, r *http.Request) {
@@ -48,15 +48,15 @@ func (h friendHandler) GetFriendList(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	isValidInput := utils.ValidateEmailInput([]string{req.Email})
+	isValidInput := pkg.ValidateEmailInput([]string{req.Email})
 	if !isValidInput {
-		utils.ResponseError(w, 103, utils.ErrInvalidEmailFormat)
+		pkg.ResponseError(w, 103, pkg.ErrInvalidEmailFormat)
 		return
 	}
 
 	users, err := h.friendController.GetFriendList(req.Email)
 	if err != nil {
-		utils.ResponseError(w, http.StatusInternalServerError, err)
+		pkg.ResponseError(w, http.StatusInternalServerError, err)
 		return
 	}
 	var emails []string
@@ -73,7 +73,7 @@ func (h friendHandler) GetFriendList(w http.ResponseWriter, r *http.Request) {
 	}
 	respData, err := json.Marshal(&resp)
 	if err != nil {
-		utils.ResponseError(w, http.StatusInternalServerError, err)
+		pkg.ResponseError(w, http.StatusInternalServerError, err)
 		return
 	}
 	w.WriteHeader(http.StatusOK)
@@ -89,15 +89,15 @@ func (h friendHandler) GetMutualFriendList(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
-	isValidInput := utils.ValidateEmailInput([]string{req.Friends[0], req.Friends[1]})
+	isValidInput := pkg.ValidateEmailInput([]string{req.Friends[0], req.Friends[1]})
 	if !isValidInput {
-		utils.ResponseError(w, 103, utils.ErrInvalidEmailFormat)
+		pkg.ResponseError(w, 103, pkg.ErrInvalidEmailFormat)
 		return
 	}
 
 	users, err := h.friendController.GetMutualFriendList(req.Friends[0], req.Friends[1])
 	if err != nil {
-		utils.ResponseError(w, http.StatusInternalServerError, err)
+		pkg.ResponseError(w, http.StatusInternalServerError, err)
 		return
 	}
 	var emails []string
@@ -114,7 +114,7 @@ func (h friendHandler) GetMutualFriendList(w http.ResponseWriter, r *http.Reques
 	}
 	respData, err := json.Marshal(&resp)
 	if err != nil {
-		utils.ResponseError(w, http.StatusInternalServerError, err)
+		pkg.ResponseError(w, http.StatusInternalServerError, err)
 		return
 	}
 	w.WriteHeader(http.StatusOK)

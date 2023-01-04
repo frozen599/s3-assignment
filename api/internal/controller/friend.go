@@ -4,8 +4,8 @@ import (
 	"time"
 
 	"github.com/frozen599/s3-assignment/api/internal/models"
+	"github.com/frozen599/s3-assignment/api/internal/pkg"
 	"github.com/frozen599/s3-assignment/api/internal/repo"
-	"github.com/frozen599/s3-assignment/api/internal/utils"
 )
 
 type FriendController interface {
@@ -41,7 +41,7 @@ func (fc friendController) CreateFriendConnection(firstUserEmail, secondUserEmai
 		return err
 	}
 	if existedFriendship {
-		return utils.ErrFriendshipAlreadyExists
+		return pkg.ErrFriendshipAlreadyExists
 	}
 
 	isBlockingTarget, err := fc.relaRepo.CheckIfIsBlockingTarget(firstUser.ID, secondUser.ID)
@@ -49,7 +49,7 @@ func (fc friendController) CreateFriendConnection(firstUserEmail, secondUserEmai
 		return err
 	}
 	if isBlockingTarget {
-		return utils.ErrCurrentUserIsBlockingTarget
+		return pkg.ErrCurrentUserIsBlockingTarget
 	}
 
 	friendRelationShip := models.Relationship{
@@ -105,7 +105,7 @@ func (fc friendController) GetMutualFriendList(firstUserEmail, secondUserEmail s
 	if err != nil {
 		return nil, err
 	}
-	mutualFriendList := utils.GetMutualFriendList(firstUserFriendList, secondUserFriendList)
+	mutualFriendList := pkg.GetMutualFriendList(firstUserFriendList, secondUserFriendList)
 
 	var friendIDs []int
 	for _, friend := range mutualFriendList {

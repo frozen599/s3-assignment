@@ -13,7 +13,7 @@ func main() {
 	cfg := config.NewConfig()
 	db := config.InitDB(cfg)
 	if db == nil {
-		panic("cannot establish connection to db")
+		log.Fatal("cannot establish connection to db")
 	}
 	defer db.Close()
 
