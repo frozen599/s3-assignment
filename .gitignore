@@ -1,3 +1,5 @@
 .git/
 .vscode/
 build/
+cover.out
+pg_data/

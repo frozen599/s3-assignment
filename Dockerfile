@@ -8,7 +8,8 @@ RUN go mod download
 COPY . .
 
 ENV CGO_ENABLED=0 GOOS=linux GOARCH=amd64
-RUN go build -ldflags="-s -w" -o apiserver ./cmd/friends/
+
+RUN go build -ldflags="-s -w" -o apiserver ./api/cmd/friends/
 
 FROM scratch
 

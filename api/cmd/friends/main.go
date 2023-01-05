@@ -4,20 +4,22 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/frozen599/s3-assignment/api/internal/api/router"
 	"github.com/frozen599/s3-assignment/api/internal/config"
-	"github.com/frozen599/s3-assignment/api/internal/controller"
-	"github.com/go-chi/chi/v5"
-	"github.com/go-chi/chi/v5/middleware"
+	"github.com/frozen599/s3-assignment/api/internal/repo"
 )
 
 func main() {
-	r := chi.NewRouter()
 	cfg := config.NewConfig()
+	db := config.InitDB(cfg)
+	if db == nil {
+		log.Fatal("cannot establish connection to db")
+	}
+	defer db.Close()
 
-	r.Use(middleware.Logger)
-	r.Use(middleware.Timeout(cfg.ReadTimeout))
-
-	r.Get("/", controller.HealthCheck)
+	userRepo := repo.NewUserRepo(db)
+	relaRepo := repo.NewRelationshipRepo(db)
+	r := router.NewApiRouter(userRepo, relaRepo, *cfg)
 
 	server := &http.Server{
 		Handler:      r,
