@@ -49,9 +49,9 @@ func (r relationshipRepo) CheckIfIsBlockingTarget(userID, targetUserID int) (boo
 	err := r.db.
 		Model(&rela).
 		Where("user_id_1 = ? AND user_id_2 = ?", userID, targetUserID).
+		Where("relationship_type = ?", models.RelationshipTypeBlocking).
 		Limit(1).
 		Select()
-
 	if err != nil {
 		return false, err
 	}
@@ -63,9 +63,9 @@ func (r relationshipRepo) CheckIfFriendConnectionExists(userID, targetUserID int
 	err := r.db.
 		Model(&rela).
 		Where("user_id_1 = ? AND user_id_2 = ?", userID, targetUserID).
+		Where("relationship_type = ?", models.RelationshipTypeFriend).
 		Limit(1).
 		Select()
-
 	if err == pg.ErrNoRows {
 		return false, nil
 	}

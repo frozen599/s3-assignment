@@ -47,13 +47,15 @@ func (h subscriberHandler) CanReceiveUpdate(w http.ResponseWriter, r *http.Reque
 		pkg.ResponseError(w, http.StatusBadRequest, pkg.ErrRequestBodyMalformed)
 		return
 	}
-	isValidInput := pkg.ValidateEmailInput([]string{req.Sender})
+
+	mentionEmails := pkg.ExtractEmail(req.Text)
+	isValidInput := pkg.ValidateEmailInput(append(mentionEmails, req.Sender))
 	if !isValidInput {
 		pkg.ResponseError(w, http.StatusBadRequest, pkg.ErrInvalidEmailFormat)
 		return
 	}
 
-	emails, err := h.subscriberController.CanReceiveUpdate(req.Sender, req.Text)
+	emails, err := h.subscriberController.CanReceiveUpdate(req.Sender, mentionEmails)
 	if err != nil {
 		pkg.ResponseError(w, http.StatusInternalServerError, err)
 		return

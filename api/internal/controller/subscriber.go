@@ -10,7 +10,7 @@ import (
 
 type SubscriberController interface {
 	CreateSubScription(requestor, target string) error
-	CanReceiveUpdate(sender, text string) ([]string, error)
+	CanReceiveUpdate(sender string, mentionedEmails []string) ([]string, error)
 }
 
 type subscriberController struct {
@@ -53,14 +53,13 @@ func (sc subscriberController) CreateSubScription(requestor, target string) erro
 	return pkg.ErrUserNotFound
 }
 
-func (sc subscriberController) CanReceiveUpdate(sender, text string) ([]string, error) {
+func (sc subscriberController) CanReceiveUpdate(sender string, mentionedEmails []string) ([]string, error) {
 	senderUser, err := sc.userRepo.GetUserByEmail(sender)
 	if err != nil {
 		return nil, err
 	}
 
-	mentionedEmail := pkg.ParseEmail(text)[0]
-	mentionedUser, err := sc.userRepo.GetUserByEmail(mentionedEmail)
+	mentionedUsers, err := sc.userRepo.GetUserByEmails(mentionedEmails)
 	if err != nil {
 		return nil, err
 	}
@@ -82,8 +81,10 @@ func (sc subscriberController) CanReceiveUpdate(sender, text string) ([]string, 
 		for _, user := range users {
 			emails = append(emails, user.Email)
 		}
-		if mentionedUser != nil {
-			emails = append(emails, mentionedUser.Email)
+		if len(mentionedUsers) > 0 {
+			for _, user := range mentionedUsers {
+				emails = append(emails, user.Email)
+			}
 		}
 		return emails, nil
 	}

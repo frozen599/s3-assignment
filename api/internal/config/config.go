@@ -95,6 +95,8 @@ func NewConfig() *Config {
 		}
 
 	})
+	pwd, _ := os.Getwd()
+	fmt.Println(pwd)
 	// Return configured config instance.
 	return instance
 }
