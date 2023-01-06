@@ -31,7 +31,7 @@ func (h blockingHandler) Block(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = h.blockingController.BlockUpdate(req.Requestor, req.Target)
+	err = h.blockingController.Block(req.Requestor, req.Target)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return

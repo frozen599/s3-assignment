@@ -4,11 +4,12 @@ import (
 	"time"
 
 	"github.com/frozen599/s3-assignment/api/internal/models"
+	"github.com/frozen599/s3-assignment/api/internal/pkg"
 	"github.com/frozen599/s3-assignment/api/internal/repo"
 )
 
 type BlockingController interface {
-	BlockUpdate(requestor, target string) error
+	Block(requestor, target string) error
 }
 
 type blockingController struct {
@@ -23,7 +24,7 @@ func NewBlockingController(userRepo repo.UserRepo, relaRepo repo.RelationshipRep
 	}
 }
 
-func (bc blockingController) BlockUpdate(requestor string, target string) error {
+func (bc blockingController) Block(requestor string, target string) error {
 	requestorUser, err := bc.userRepo.GetUserByEmail(requestor)
 	if err != nil {
 		return err
@@ -31,6 +32,14 @@ func (bc blockingController) BlockUpdate(requestor string, target string) error 
 	targetUser, err := bc.userRepo.GetUserByEmail(target)
 	if err != nil {
 		return err
+	}
+
+	isBlockingTarget, err := bc.relaRepo.CheckIfIsBlockingTarget(requestorUser.ID, targetUser.ID)
+	if err != nil {
+		return err
+	}
+	if isBlockingTarget {
+		return pkg.ErrCurrentUserIsBlockingTarget
 	}
 
 	blockingRelationShip := models.Relationship{
