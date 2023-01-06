@@ -39,7 +39,7 @@ func TestRepo_CreateFriend(t *testing.T) {
 
 	for desc, tc := range tcs {
 		t.Run(desc, func(t *testing.T) {
-			cfg := config.NewConfig()
+			cfg := config.NewConfig("./../../..")
 			dbInstance := config.InitDB(cfg)
 			defer dbInstance.Close()
 
@@ -100,7 +100,7 @@ func TestRepo_CheckIfFriendConnectionExists(t *testing.T) {
 
 	for desc, tc := range tcs {
 		t.Run(desc, func(t *testing.T) {
-			cfg := config.NewConfig()
+			cfg := config.NewConfig("./../../..")
 			dbInstance := config.InitDB(cfg)
 			defer dbInstance.Close()
 
@@ -145,7 +145,7 @@ func TestRepo_CheckIfIsBlockingTarget(t *testing.T) {
 
 	for desc, tc := range tcs {
 		t.Run(desc, func(t *testing.T) {
-			cfg := config.NewConfig()
+			cfg := config.NewConfig("./../../..")
 			dbInstance := config.InitDB(cfg)
 			defer dbInstance.Close()
 
@@ -178,7 +178,7 @@ func TestRepo_CanReceiveUpdate(t *testing.T) {
 
 	for desc, tc := range tcs {
 		t.Run(desc, func(t *testing.T) {
-			cfg := config.NewConfig()
+			cfg := config.NewConfig("./../../..")
 			dbInstance := config.InitDB(cfg)
 			defer dbInstance.Close()
 

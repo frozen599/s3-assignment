@@ -33,15 +33,10 @@ var (
 )
 
 // NewConfig function to prepare config variables from .env file and return config.
-func NewConfig() *Config {
+func NewConfig(path string) *Config {
 	// Configuring config one time.
 	once.Do(func() {
-		curDir, err := os.Getwd()
-		if err != nil {
-			log.Fatal("cannot load current directory")
-		}
-
-		err = godotenv.Load(curDir + "/.env")
+		err := godotenv.Load(path + "/.env")
 		if err != nil {
 			log.Fatal(err)
 		}

@@ -23,7 +23,7 @@ func TestRepo_GetUserByEmail(t *testing.T) {
 	}
 	for desc, tc := range tcs {
 		t.Run(desc, func(t *testing.T) {
-			cfg := config.NewConfig()
+			cfg := config.NewConfig("./../../..")
 			dbInstance := config.InitDB(cfg)
 			defer dbInstance.Close()
 
@@ -55,7 +55,7 @@ func TestRepo_GetUserByID(t *testing.T) {
 	}
 	for desc, tc := range tcs {
 		t.Run(desc, func(t *testing.T) {
-			cfg := config.NewConfig()
+			cfg := config.NewConfig("./../../..")
 			dbInstance := config.InitDB(cfg)
 			defer dbInstance.Close()
 

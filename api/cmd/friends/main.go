@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 
@@ -10,12 +11,13 @@ import (
 )
 
 func main() {
-	cfg := config.NewConfig()
+	cfg := config.NewConfig(".")
 	db := config.InitDB(cfg)
 	if db == nil {
 		log.Fatal("cannot establish connection to db")
 	}
 	defer db.Close()
+	fmt.Println(cfg)
 
 	userRepo := repo.NewUserRepo(db)
 	relaRepo := repo.NewRelationshipRepo(db)
