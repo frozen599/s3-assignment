@@ -1,6 +1,7 @@
 package repo
 
 import (
+	"io/ioutil"
 	"testing"
 
 	"github.com/frozen599/s3-assignment/api/internal/config"
@@ -27,9 +28,13 @@ func TestRepo_GetUserByEmail(t *testing.T) {
 			dbInstance := config.InitDB(cfg)
 			defer dbInstance.Close()
 
-			tx, err := dbInstance.Begin()
+			initData, err := ioutil.ReadFile("./test_data/init_data.sql")
 			require.NoError(t, err)
-			defer tx.Rollback()
+			_, err = dbInstance.Exec(string(initData))
+			require.NoError(t, err)
+			deleteData, err := ioutil.ReadFile("./test_data/delet_data.sql")
+			require.NoError(t, err)
+			defer dbInstance.Exec(deleteData)
 
 			repo := NewUserRepo(dbInstance)
 			user, err := repo.GetUserByEmail(tc.userEmail)
@@ -59,9 +64,13 @@ func TestRepo_GetUserByID(t *testing.T) {
 			dbInstance := config.InitDB(cfg)
 			defer dbInstance.Close()
 
-			tx, err := dbInstance.Begin()
+			initData, err := ioutil.ReadFile("./test_data/init_data.sql")
 			require.NoError(t, err)
-			defer tx.Rollback()
+			_, err = dbInstance.Exec(string(initData))
+			require.NoError(t, err)
+			deleteData, err := ioutil.ReadFile("./test_data/delet_data.sql")
+			require.NoError(t, err)
+			defer dbInstance.Exec(deleteData)
 
 			repo := NewUserRepo(dbInstance)
 			users, err := repo.GetUserByIDs([]int{tc.userID})

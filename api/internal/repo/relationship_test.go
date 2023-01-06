@@ -43,15 +43,13 @@ func TestRepo_CreateFriend(t *testing.T) {
 			dbInstance := config.InitDB(cfg)
 			defer dbInstance.Close()
 
-			_, err := ioutil.ReadFile("./test_data/create_friend.sql")
+			initData, err := ioutil.ReadFile("./test_data/init_data.sql")
 			require.NoError(t, err)
-
-			tx, err := dbInstance.Begin()
-			if err != nil {
-				t.Error("cannot create tx")
-				return
-			}
-			defer tx.Rollback()
+			_, err = dbInstance.Exec(string(initData))
+			require.NoError(t, err)
+			deleteData, err := ioutil.ReadFile("./test_data/delet_data.sql")
+			require.NoError(t, err)
+			defer dbInstance.Exec(deleteData)
 
 			repo := NewRelationshipRepo(dbInstance)
 			err = repo.CreateRelationship(models.Relationship{
@@ -104,9 +102,13 @@ func TestRepo_CheckIfFriendConnectionExists(t *testing.T) {
 			dbInstance := config.InitDB(cfg)
 			defer dbInstance.Close()
 
-			tx, err := dbInstance.Begin()
+			initData, err := ioutil.ReadFile("./test_data/init_data.sql")
 			require.NoError(t, err)
-			defer tx.Rollback()
+			_, err = dbInstance.Exec(string(initData))
+			require.NoError(t, err)
+			deleteData, err := ioutil.ReadFile("./test_data/delet_data.sql")
+			require.NoError(t, err)
+			defer dbInstance.Exec(deleteData)
 
 			repo := NewRelationshipRepo(dbInstance)
 			exists, err := repo.CheckIfFriendConnectionExists(tc.input.userID1, tc.input.userID2)
@@ -129,8 +131,8 @@ func TestRepo_CheckIfIsBlockingTarget(t *testing.T) {
 	}{
 		"is blocking": {
 			input: mockBlocking{
-				userID1: 5,
-				userID2: 6,
+				userID1: 1,
+				userID2: 2,
 			},
 			result: true,
 		},
@@ -149,9 +151,13 @@ func TestRepo_CheckIfIsBlockingTarget(t *testing.T) {
 			dbInstance := config.InitDB(cfg)
 			defer dbInstance.Close()
 
-			tx, err := dbInstance.Begin()
+			initData, err := ioutil.ReadFile("./test_data/init_data.sql")
 			require.NoError(t, err)
-			defer tx.Rollback()
+			_, err = dbInstance.Exec(string(initData))
+			require.NoError(t, err)
+			deleteData, err := ioutil.ReadFile("./test_data/delet_data.sql")
+			require.NoError(t, err)
+			defer dbInstance.Exec(deleteData)
 
 			repo := NewRelationshipRepo(dbInstance)
 			exists, err := repo.CheckIfFriendConnectionExists(tc.input.userID1, tc.input.userID2)
@@ -172,7 +178,7 @@ func TestRepo_CanReceiveUpdate(t *testing.T) {
 		},
 		"cannot receive update": {
 			userID: 2,
-			result: 0,
+			result: 3,
 		},
 	}
 
@@ -182,9 +188,13 @@ func TestRepo_CanReceiveUpdate(t *testing.T) {
 			dbInstance := config.InitDB(cfg)
 			defer dbInstance.Close()
 
-			tx, err := dbInstance.Begin()
+			initData, err := ioutil.ReadFile("./test_data/init_data.sql")
 			require.NoError(t, err)
-			defer tx.Rollback()
+			_, err = dbInstance.Exec(string(initData))
+			require.NoError(t, err)
+			deleteData, err := ioutil.ReadFile("./test_data/delet_data.sql")
+			require.NoError(t, err)
+			defer dbInstance.Exec(deleteData)
 
 			repo := NewRelationshipRepo(dbInstance)
 			relas, err := repo.CanReceiveUpdate(tc.userID)
