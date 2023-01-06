@@ -73,6 +73,7 @@ func (sc subscriberController) CanReceiveUpdate(sender string, mentionedEmails [
 		for _, rela := range relas {
 			userIDs = append(userIDs, rela.UserID2)
 		}
+
 		users, err := sc.userRepo.GetUserByIDs(userIDs)
 		if err != nil {
 			return nil, err
