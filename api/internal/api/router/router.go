@@ -32,7 +32,7 @@ func NewApiRouter(userRepo repo.UserRepo, relaRepo repo.RelationshipRepo, cfg co
 	blockingController := controller.NewBlockingController(userRepo, relaRepo)
 	blockingHandler := handler.NewBlockingHandler(blockingController)
 	router.Route("/api/v1/blockings", func(r chi.Router) {
-		r.Post("/", blockingHandler.BlockUpdate)
+		r.Post("/", blockingHandler.Block)
 	})
 
 	subscriberController := controller.NewSubscriberController(userRepo, relaRepo)

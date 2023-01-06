@@ -17,7 +17,7 @@ func NewBlockingHandler(blockingController controller.BlockingController) blocki
 	return blockingHandler{blockingController: blockingController}
 }
 
-func (h blockingHandler) BlockUpdate(w http.ResponseWriter, r *http.Request) {
+func (h blockingHandler) Block(w http.ResponseWriter, r *http.Request) {
 	var req forms.BlockingRequest
 	err := json.NewDecoder(r.Body).Decode(&req)
 	if err != nil {
