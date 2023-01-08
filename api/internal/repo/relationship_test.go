@@ -37,19 +37,20 @@ func TestRepo_CreateFriend(t *testing.T) {
 		},
 	}
 
+	cfg := config.NewConfig("./../../..")
+	dbInstance := config.InitDB(cfg)
+	defer dbInstance.Close()
+
+	initData, err := ioutil.ReadFile("./test_data/init_data.sql")
+	require.NoError(t, err)
+	_, err = dbInstance.Exec(string(initData))
+	require.NoError(t, err)
+	deleteData, err := ioutil.ReadFile("./test_data/delete_data.sql")
+	require.NoError(t, err)
+	defer dbInstance.Exec(string(deleteData))
+
 	for desc, tc := range tcs {
 		t.Run(desc, func(t *testing.T) {
-			cfg := config.NewConfig("./../../..")
-			dbInstance := config.InitDB(cfg)
-			defer dbInstance.Close()
-
-			initData, err := ioutil.ReadFile("./test_data/init_data.sql")
-			require.NoError(t, err)
-			_, err = dbInstance.Exec(string(initData))
-			require.NoError(t, err)
-			deleteData, err := ioutil.ReadFile("./test_data/delet_data.sql")
-			require.NoError(t, err)
-			defer dbInstance.Exec(deleteData)
 
 			repo := NewRelationshipRepo(dbInstance)
 			err = repo.CreateRelationship(models.Relationship{
@@ -96,20 +97,20 @@ func TestRepo_CheckIfFriendConnectionExists(t *testing.T) {
 		},
 	}
 
+	cfg := config.NewConfig("./../../..")
+	dbInstance := config.InitDB(cfg)
+	defer dbInstance.Close()
+
+	initData, err := ioutil.ReadFile("./test_data/init_data.sql")
+	require.NoError(t, err)
+	_, err = dbInstance.Exec(string(initData))
+	require.NoError(t, err)
+	deleteData, err := ioutil.ReadFile("./test_data/delete_data.sql")
+	require.NoError(t, err)
+	defer dbInstance.Exec(string(deleteData))
+
 	for desc, tc := range tcs {
 		t.Run(desc, func(t *testing.T) {
-			cfg := config.NewConfig("./../../..")
-			dbInstance := config.InitDB(cfg)
-			defer dbInstance.Close()
-
-			initData, err := ioutil.ReadFile("./test_data/init_data.sql")
-			require.NoError(t, err)
-			_, err = dbInstance.Exec(string(initData))
-			require.NoError(t, err)
-			deleteData, err := ioutil.ReadFile("./test_data/delet_data.sql")
-			require.NoError(t, err)
-			defer dbInstance.Exec(deleteData)
-
 			repo := NewRelationshipRepo(dbInstance)
 			exists, err := repo.CheckIfFriendConnectionExists(tc.input.userID1, tc.input.userID2)
 			require.NoError(t, err)
@@ -145,20 +146,20 @@ func TestRepo_CheckIfIsBlockingTarget(t *testing.T) {
 		},
 	}
 
+	cfg := config.NewConfig("./../../..")
+	dbInstance := config.InitDB(cfg)
+	defer dbInstance.Close()
+
+	initData, err := ioutil.ReadFile("./test_data/init_data.sql")
+	require.NoError(t, err)
+	_, err = dbInstance.Exec(string(initData))
+	require.NoError(t, err)
+	deleteData, err := ioutil.ReadFile("./test_data/delete_data.sql")
+	require.NoError(t, err)
+	defer dbInstance.Exec(string(deleteData))
+
 	for desc, tc := range tcs {
 		t.Run(desc, func(t *testing.T) {
-			cfg := config.NewConfig("./../../..")
-			dbInstance := config.InitDB(cfg)
-			defer dbInstance.Close()
-
-			initData, err := ioutil.ReadFile("./test_data/init_data.sql")
-			require.NoError(t, err)
-			_, err = dbInstance.Exec(string(initData))
-			require.NoError(t, err)
-			deleteData, err := ioutil.ReadFile("./test_data/delet_data.sql")
-			require.NoError(t, err)
-			defer dbInstance.Exec(deleteData)
-
 			repo := NewRelationshipRepo(dbInstance)
 			exists, err := repo.CheckIfFriendConnectionExists(tc.input.userID1, tc.input.userID2)
 			require.NoError(t, err)
