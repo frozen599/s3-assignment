@@ -39,7 +39,7 @@ func NewApiRouter(userRepo repo.UserRepo, relaRepo repo.RelationshipRepo, cfg co
 	subscriberHandler := handler.NewSubscriberHandler(subscriberController)
 	router.Route("/api/v1/subscribers", func(r chi.Router) {
 		r.Post("/", subscriberHandler.CreateSubscription)
-		r.Post("/can-receive-update", subscriberHandler.CanReceiveUpdate)
+		r.Post("/can-receive-update", subscriberHandler.GetCanReceiveUpdate)
 	})
 
 	return router

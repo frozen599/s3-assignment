@@ -40,7 +40,7 @@ func (h subscriberHandler) CreateSubscription(w http.ResponseWriter, r *http.Req
 	pkg.ResponseOk(w)
 }
 
-func (h subscriberHandler) CanReceiveUpdate(w http.ResponseWriter, r *http.Request) {
+func (h subscriberHandler) GetCanReceiveUpdate(w http.ResponseWriter, r *http.Request) {
 	var req forms.CanReceiveUpdateRequest
 	err := json.NewDecoder(r.Body).Decode(&req)
 	if err != nil {

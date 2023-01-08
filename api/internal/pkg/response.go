@@ -30,13 +30,11 @@ func ResponseError(w http.ResponseWriter, code int, err error) {
 	resp := make(map[string]interface{})
 	resp["success"] = false
 	resp["message"] = err.Error()
-	if code == http.StatusInternalServerError {
-		resp["message"] = "INTERNAL SERVER ERROR"
-	}
 	respData, err := json.Marshal(resp)
 	if err != nil {
 		log.Fatal(err)
 		fmt.Fprintln(w, nil)
+		return
 	}
 	fmt.Fprintln(w, respData)
 }

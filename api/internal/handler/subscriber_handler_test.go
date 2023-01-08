@@ -100,7 +100,7 @@ func TestHandler_CanReceiveUpdate(t *testing.T) {
 			relaRepo := repo.NewRelationshipRepo(dbInstance)
 
 			subscriberController := controller.NewSubscriberController(userRepo, relaRepo)
-			handler := http.HandlerFunc(NewSubscriberHandler(subscriberController).CanReceiveUpdate)
+			handler := http.HandlerFunc(NewSubscriberHandler(subscriberController).GetCanReceiveUpdate)
 			handler.ServeHTTP(res, req)
 			if tc.expErr != nil {
 				require.Equal(t, tc.statusCode, res.Code)
