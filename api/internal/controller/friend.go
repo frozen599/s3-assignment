@@ -35,12 +35,15 @@ func (fc friendController) CreateFriendConnection(firstUserEmail, secondUserEmai
 	if err != nil {
 		return err
 	}
+	if firstUser == nil || secondUser == nil {
+		return pkg.ErrUserNotFound
+	}
 
-	existedFriendship, err := fc.relaRepo.CheckIfFriendConnectionExists(firstUser.ID, secondUser.ID)
+	existingFriendship, err := fc.relaRepo.CheckIfFriendConnectionExists(firstUser.ID, secondUser.ID)
 	if err != nil {
 		return err
 	}
-	if existedFriendship {
+	if existingFriendship {
 		return pkg.ErrFriendshipAlreadyExists
 	}
 
@@ -71,6 +74,10 @@ func (fc friendController) GetFriendList(email string) ([]models.User, error) {
 	if err != nil {
 		return nil, err
 	}
+	if user == nil {
+		return nil, pkg.ErrUserNotFound
+	}
+
 	friendListRelationships, err := fc.relaRepo.GetFriendList(user.ID)
 	if err != nil {
 		return nil, err
@@ -95,6 +102,9 @@ func (fc friendController) GetMutualFriendList(firstUserEmail, secondUserEmail s
 	secondUser, err := fc.userRepo.GetUserByEmail(secondUserEmail)
 	if err != nil {
 		return nil, err
+	}
+	if firstUser == nil || secondUser == nil {
+		return nil, pkg.ErrUserNotFound
 	}
 
 	firstUserFriendList, err := fc.relaRepo.GetFriendList(firstUser.ID)

@@ -33,6 +33,9 @@ func (bc blockingController) Block(requestor string, target string) error {
 	if err != nil {
 		return err
 	}
+	if requestorUser == nil || targetUser == nil {
+		return pkg.ErrUserNotFound
+	}
 
 	isBlockingTarget, err := bc.relaRepo.CheckIfIsBlockingTarget(requestorUser.ID, targetUser.ID)
 	if err != nil {
