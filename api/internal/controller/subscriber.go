@@ -34,23 +34,32 @@ func (sc subscriberController) CreateSubScription(requestor, target string) erro
 	if err != nil {
 		return err
 	}
-
-	if requestorUser != nil && targetUser != nil {
-		blockingRelationShip := models.Relationship{
-			UserID1:          requestorUser.ID,
-			UserID2:          targetUser.ID,
-			RelationshipType: models.RelationshipTypeSubscriber,
-			CreatedAt:        time.Now(),
-			UpdatedAt:        time.Now(),
-		}
-
-		err = sc.relaRepo.CreateRelationship(blockingRelationShip)
-		if err != nil {
-			return err
-		}
-		return nil
+	if requestorUser == nil || targetUser == nil {
+		return pkg.ErrUserNotFound
 	}
-	return pkg.ErrUserNotFound
+
+	isAlreadySubscribing, err := sc.relaRepo.CheckIfAlreadySubscribing(requestorUser.ID, targetUser.ID)
+	if err != nil {
+		return err
+	}
+	if isAlreadySubscribing {
+		return pkg.ErrCurrentUserIsAlreadySubscribingTarget
+	}
+
+	blockingRelationShip := models.Relationship{
+		UserID1:          requestorUser.ID,
+		UserID2:          targetUser.ID,
+		RelationshipType: models.RelationshipTypeSubscriber,
+		CreatedAt:        time.Now(),
+		UpdatedAt:        time.Now(),
+	}
+
+	err = sc.relaRepo.CreateRelationship(blockingRelationShip)
+	if err != nil {
+		return err
+	}
+	return nil
+
 }
 
 func (sc subscriberController) CanReceiveUpdate(sender string, mentionedEmails []string) ([]string, error) {

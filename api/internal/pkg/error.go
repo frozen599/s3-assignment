@@ -7,9 +7,10 @@ func (e ApiError) Error() string {
 }
 
 var (
-	ErrFriendshipAlreadyExists     = ApiError("friendship already exists")
-	ErrCurrentUserIsBlockingTarget = ApiError("requestor is blocking target")
-	ErrUserNotFound                = ApiError("user not found")
-	ErrInvalidEmailFormat          = ApiError("invalid email format")
-	ErrRequestBodyMalformed        = ApiError("request body is malformed")
+	ErrFriendshipAlreadyExists               = ApiError("friendship already exists")
+	ErrCurrentUserIsBlockingTarget           = ApiError("requestor is blocking target")
+	ErrCurrentUserIsAlreadySubscribingTarget = ApiError("requestor is already subscribing target")
+	ErrUserNotFound                          = ApiError("user not found")
+	ErrInvalidEmailFormat                    = ApiError("invalid email format")
+	ErrRequestBodyMalformed                  = ApiError("request body is malformed")
 )

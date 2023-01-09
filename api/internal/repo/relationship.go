@@ -8,9 +8,10 @@ import (
 type RelationshipRepo interface {
 	CreateRelationship(friendRelationship models.Relationship) error
 	GetFriendList(userID int) ([]models.Relationship, error)
-	CheckIfIsBlockingTarget(userId, targetUserId int) (bool, error)
+	CheckIfIsBlockingTarget(userID, targetUserID int) (bool, error)
 	CheckIfFriendConnectionExists(userID, targetUserID int) (bool, error)
 	CanReceiveUpdate(userID int) ([]models.Relationship, error)
+	CheckIfAlreadySubscribing(userID, targetUserID int) (bool, error)
 }
 
 type relationshipRepo struct {
@@ -52,8 +53,8 @@ func (r relationshipRepo) CheckIfIsBlockingTarget(userID, targetUserID int) (boo
 		Where("relationship_type = ?", models.RelationshipTypeBlocking).
 		Limit(1).
 		Select()
-	if err != nil {
-		return false, err
+	if err == pg.ErrNoRows {
+		return false, nil
 	}
 	return rela.ID != 0, err
 }
@@ -85,4 +86,18 @@ func (r relationshipRepo) CanReceiveUpdate(userID int) ([]models.Relationship, e
 		return nil, nil
 	}
 	return ret, err
+}
+
+func (r relationshipRepo) CheckIfAlreadySubscribing(userID, targetUserID int) (bool, error) {
+	var rela models.Relationship
+	err := r.db.
+		Model(&rela).
+		Where("user_id_1 = ? AND user_id_2 = ?", userID, targetUserID).
+		Where("relationship_type = ?", models.RelationshipTypeSubscriber).
+		Limit(1).
+		Select()
+	if err == pg.ErrNoRows {
+		return false, nil
+	}
+	return rela.ID != 0, err
 }
