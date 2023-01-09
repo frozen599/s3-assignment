@@ -21,7 +21,7 @@ func ResponseOk(w http.ResponseWriter) {
 		fmt.Fprintln(w, nil)
 		return
 	}
-	fmt.Fprintln(w, respData)
+	w.Write(respData)
 }
 
 func ResponseError(w http.ResponseWriter, code int, err error) {
@@ -36,5 +36,5 @@ func ResponseError(w http.ResponseWriter, code int, err error) {
 		fmt.Fprintln(w, nil)
 		return
 	}
-	fmt.Fprintln(w, respData)
+	w.Write(respData)
 }

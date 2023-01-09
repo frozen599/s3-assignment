@@ -2,7 +2,7 @@
 
 APP_NAME = apiserver
 BUILD_DIR = $(PWD)/build
-DATABASE_URL=postgres://postgres:password@localhost:5432/postgres?sslmode=disable
+DATABASE_URL=postgres://postgres:password@0.0.0.0:5432/postgres?sslmode=disable
 
 clean:
 	rm -rf ./build
@@ -35,21 +35,26 @@ migrate.down:
 docker.run: docker.postgres docker.chi migrate.up
 
 docker.chi.build:
-	docker build -t chi .
+	docker build -t chi . --no-cache
 
 docker.chi: docker.chi.build
-	docker run --rm -d \
+	docker run -d \
 		--name s3-chi \
+		--network dev-network \
 		-p 8000:8000 \
 		chi
 
+docker.network:
+	docker network create -d bridge dev-network
+
 docker.postgres:
-	docker run --rm -d \
+	docker run -d \
 		--name s3-postgres \
 		-e POSTGRES_USER=postgres \
 		-e POSTGRES_PASSWORD=password \
 		-e POSTGRES_DB=postgres \
 		-v ${PWD}/pg_data/:/var/lib/postgresql/data \
+		--network dev-network \
 		-p 5432:5432 \
 		postgres
 

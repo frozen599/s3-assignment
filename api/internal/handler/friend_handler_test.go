@@ -23,29 +23,29 @@ func TestHandler_CreateFriend(t *testing.T) {
 		statusCode int
 	}{
 		"success": {
-			input:      "{\"friends\":[\"john@example.com\", \"andy\"]}",
-			expBody:    `{"success":"true"}`,
+			input:      "{\"friends\":[\"john@example.com\",\"andy\"]}",
+			expBody:    "{\"success\":true}",
 			statusCode: http.StatusOK,
-			expErr:     pkg.ErrInvalidEmailFormat,
+			expErr:     nil,
 		},
 	}
+
+	cfg := config.NewConfig("./../../..")
+	dbInstance := config.InitDB(cfg)
+	defer dbInstance.Close()
+
+	initData, err := ioutil.ReadFile("./test_data/init_data.sql")
+	require.NoError(t, err)
+	_, err = dbInstance.Exec(string(initData))
+	require.NoError(t, err)
+	deleteData, err := ioutil.ReadFile("./test_data/delete_data.sql")
+	require.NoError(t, err)
+	defer dbInstance.Exec(string(deleteData))
 
 	for desc, tc := range tcs {
 		t.Run(desc, func(t *testing.T) {
 			res := httptest.NewRecorder()
 			req := httptest.NewRequest("POST", "/api/v1/friends", strings.NewReader(tc.input))
-
-			cfg := config.NewConfig("./../../..")
-			dbInstance := config.InitDB(cfg)
-			defer dbInstance.Close()
-
-			initData, err := ioutil.ReadFile("./../test_data/init_data.sql")
-			require.NoError(t, err)
-			_, err = dbInstance.Exec(string(initData))
-			require.NoError(t, err)
-			deleteData, err := ioutil.ReadFile("./../test_data/delete_data.sql")
-			require.NoError(t, err)
-			defer dbInstance.Exec(deleteData)
 
 			userRepo := repo.NewUserRepo(dbInstance)
 			relaRepo := repo.NewRelationshipRepo(dbInstance)
@@ -72,29 +72,29 @@ func TestHandler_GetFriendList(t *testing.T) {
 		statusCode int
 	}{
 		"success": {
-			input:      "{\"email\": \"john@example.com\"}",
-			expBody:    `{"success":"true"}`,
+			input:      "{\"email\":\"john@example.com\"}",
+			expBody:    "{\"success\":true}",
 			statusCode: http.StatusOK,
 			expErr:     pkg.ErrInvalidEmailFormat,
 		},
 	}
 
+	cfg := config.NewConfig("./../../..")
+	dbInstance := config.InitDB(cfg)
+	defer dbInstance.Close()
+
+	initData, err := ioutil.ReadFile("./test_data/init_data.sql")
+	require.NoError(t, err)
+	_, err = dbInstance.Exec(string(initData))
+	require.NoError(t, err)
+	deleteData, err := ioutil.ReadFile("./test_data/delete_data.sql")
+	require.NoError(t, err)
+	defer dbInstance.Exec(string(deleteData))
+
 	for desc, tc := range tcs {
 		t.Run(desc, func(t *testing.T) {
 			res := httptest.NewRecorder()
 			req := httptest.NewRequest("POST", "/api/v1/friends", strings.NewReader(tc.input))
-
-			cfg := config.NewConfig("./../../..")
-			dbInstance := config.InitDB(cfg)
-			defer dbInstance.Close()
-
-			initData, err := ioutil.ReadFile("./../test_data/init_data.sql")
-			require.NoError(t, err)
-			_, err = dbInstance.Exec(string(initData))
-			require.NoError(t, err)
-			deleteData, err := ioutil.ReadFile("./../test_data/delete_data.sql")
-			require.NoError(t, err)
-			defer dbInstance.Exec(deleteData)
 
 			userRepo := repo.NewUserRepo(dbInstance)
 			relaRepo := repo.NewRelationshipRepo(dbInstance)
@@ -121,33 +121,31 @@ func TestHandler_GetMutualFriendList(t *testing.T) {
 		statusCode int
 	}{
 		"success": {
-			input:      `{\"friends\": [\"john@example.com\", \"abc@gmail.com\"]}`,
-			expBody:    `{"success":"true"}`,
+			input:      "{\"friends\":[\"john@example.com\",\"abc@gmail.com\"]}",
+			expBody:    "{\"success\":true}",
 			statusCode: http.StatusOK,
-			expErr:     pkg.ErrInvalidEmailFormat,
+			expErr:     nil,
 		},
 	}
+
+	cfg := config.NewConfig("./../../..")
+	dbInstance := config.InitDB(cfg)
+	defer dbInstance.Close()
+
+	initData, err := ioutil.ReadFile("./test_data/init_data.sql")
+	require.NoError(t, err)
+	_, err = dbInstance.Exec(string(initData))
+	require.NoError(t, err)
+	deleteData, err := ioutil.ReadFile("./test_data/delete_data.sql")
+	require.NoError(t, err)
+	defer dbInstance.Exec(string(deleteData))
 
 	for desc, tc := range tcs {
 		t.Run(desc, func(t *testing.T) {
 			res := httptest.NewRecorder()
 			req := httptest.NewRequest("POST", "/api/v1/friends", strings.NewReader(tc.input))
-
-			cfg := config.NewConfig("./../../..")
-			dbInstance := config.InitDB(cfg)
-			defer dbInstance.Close()
-
-			initData, err := ioutil.ReadFile("./../test_data/init_data.sql")
-			require.NoError(t, err)
-			_, err = dbInstance.Exec(string(initData))
-			require.NoError(t, err)
-			deleteData, err := ioutil.ReadFile("./../test_data/delete_data.sql")
-			require.NoError(t, err)
-			defer dbInstance.Exec(deleteData)
-
 			userRepo := repo.NewUserRepo(dbInstance)
 			relaRepo := repo.NewRelationshipRepo(dbInstance)
-
 			friendController := controller.NewFriendController(userRepo, relaRepo)
 			handler := http.HandlerFunc(NewFriendHanlder(friendController).GetMutualFriendList)
 			handler.ServeHTTP(res, req)

@@ -2,7 +2,6 @@ package handler
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 
 	"github.com/frozen599/s3-assignment/api/internal/controller"
@@ -74,5 +73,5 @@ func (h subscriberHandler) GetCanReceiveUpdate(w http.ResponseWriter, r *http.Re
 	}
 	w.WriteHeader(http.StatusOK)
 	w.Header().Set("Content-Type", "application/json")
-	fmt.Fprintln(w, respData)
+	w.Write(respData)
 }

@@ -2,7 +2,6 @@ package handler
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 
 	"github.com/frozen599/s3-assignment/api/internal/controller"
@@ -78,7 +77,7 @@ func (h friendHandler) GetFriendList(w http.ResponseWriter, r *http.Request) {
 	}
 	w.WriteHeader(http.StatusOK)
 	w.Header().Set("Content-Type", "application/json")
-	fmt.Fprintln(w, respData)
+	w.Write(respData)
 }
 
 func (h friendHandler) GetMutualFriendList(w http.ResponseWriter, r *http.Request) {
@@ -119,5 +118,5 @@ func (h friendHandler) GetMutualFriendList(w http.ResponseWriter, r *http.Reques
 	}
 	w.WriteHeader(http.StatusOK)
 	w.Header().Set("Content-Type", "application/json")
-	fmt.Fprintln(w, respData)
+	w.Write(respData)
 }
