@@ -168,39 +168,39 @@ func TestRepo_CheckIfIsBlockingTarget(t *testing.T) {
 	}
 }
 
-func TestRepo_CanReceiveUpdate(t *testing.T) {
-	tcs := map[string]struct {
-		userID int
-		result int
-	}{
-		"can receive update": {
-			userID: 1,
-			result: 2,
-		},
-		"cannot receive update": {
-			userID: 2,
-			result: 3,
-		},
-	}
+// func TestRepo_GetCanReceiveUpdate(t *testing.T) {
+// 	tcs := map[string]struct {
+// 		userID int
+// 		result int
+// 	}{
+// 		"can receive update": {
+// 			userID: 1,
+// 			result: 2,
+// 		},
+// 		"cannot receive update": {
+// 			userID: 2,
+// 			result: 3,
+// 		},
+// 	}
 
-	for desc, tc := range tcs {
-		t.Run(desc, func(t *testing.T) {
-			cfg := config.NewConfig("./../../..")
-			dbInstance := config.InitDB(cfg)
-			defer dbInstance.Close()
+// 	for desc, tc := range tcs {
+// 		t.Run(desc, func(t *testing.T) {
+// 			cfg := config.NewConfig("./../../..")
+// 			dbInstance := config.InitDB(cfg)
+// 			defer dbInstance.Close()
 
-			initData, err := ioutil.ReadFile("./test_data/init_data.sql")
-			require.NoError(t, err)
-			_, err = dbInstance.Exec(string(initData))
-			require.NoError(t, err)
-			deleteData, err := ioutil.ReadFile("./test_data/delet_data.sql")
-			require.NoError(t, err)
-			defer dbInstance.Exec(deleteData)
+// 			initData, err := ioutil.ReadFile("./test_data/init_data.sql")
+// 			require.NoError(t, err)
+// 			_, err = dbInstance.Exec(string(initData))
+// 			require.NoError(t, err)
+// 			deleteData, err := ioutil.ReadFile("./test_data/delet_data.sql")
+// 			require.NoError(t, err)
+// 			defer dbInstance.Exec(deleteData)
 
-			repo := NewRelationshipRepo(dbInstance)
-			relas, err := repo.CanReceiveUpdate(tc.userID)
-			require.NoError(t, err)
-			require.Equal(t, tc.result, len(relas))
-		})
-	}
-}
+// 			repo := NewRelationshipRepo(dbInstance)
+// 			relas, err := repo.CanReceiveUpdate(tc.userID)
+// 			require.NoError(t, err)
+// 			require.Equal(t, tc.result, len(relas))
+// 		})
+// 	}
+// }

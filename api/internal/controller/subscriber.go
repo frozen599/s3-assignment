@@ -46,6 +46,14 @@ func (sc subscriberController) CreateSubScription(requestor, target string) erro
 		return pkg.ErrCurrentUserIsAlreadySubscribingTarget
 	}
 
+	isBlockingOrBlocked, err := sc.relaRepo.CheckIfIsBlockingOrBlocked(requestorUser.ID, targetUser.ID)
+	if err != nil {
+		return err
+	}
+	if isBlockingOrBlocked {
+		return pkg.ErrCurrentUserIsBlockingTargetOrBlocked
+	}
+
 	blockingRelationShip := models.Relationship{
 		UserID1:          requestorUser.ID,
 		UserID2:          targetUser.ID,
@@ -68,21 +76,24 @@ func (sc subscriberController) CanReceiveUpdate(sender string, mentionedEmails [
 		return nil, err
 	}
 
-	mentionedUsers, err := sc.userRepo.GetUserByEmails(mentionedEmails)
-	if err != nil {
-		return nil, err
-	}
-
-	if senderUser != nil {
-		relas, err := sc.relaRepo.CanReceiveUpdate(senderUser.ID)
+	var mentionedUsers []models.User
+	if len(mentionedEmails) > 0 {
+		mentionedUsers, err = sc.userRepo.GetUserByEmails(mentionedEmails)
 		if err != nil {
 			return nil, err
 		}
-		var userIDs []int
-		for _, rela := range relas {
-			userIDs = append(userIDs, rela.UserID2)
-		}
+	}
 
+	if senderUser != nil {
+		followerIDs, err := sc.relaRepo.GetFollowers(senderUser.ID)
+		if err != nil {
+			return nil, err
+		}
+		friendIDs, err := sc.relaRepo.GetFriendList(senderUser.ID)
+		if err != nil {
+			return nil, err
+		}
+		userIDs := pkg.RemoveDuplicateIDs(append(followerIDs, friendIDs...))
 		users, err := sc.userRepo.GetUserByIDs(userIDs)
 		if err != nil {
 			return nil, err

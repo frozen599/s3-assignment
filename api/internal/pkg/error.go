@@ -8,7 +8,7 @@ func (e ApiError) Error() string {
 
 var (
 	ErrFriendshipAlreadyExists               = ApiError("friendship already exists")
-	ErrCurrentUserIsBlockingTarget           = ApiError("requestor is blocking target")
+	ErrCurrentUserIsBlockingTargetOrBlocked  = ApiError("requestor is blocking target or being blocked")
 	ErrCurrentUserIsAlreadySubscribingTarget = ApiError("requestor is already subscribing target")
 	ErrUserNotFound                          = ApiError("user not found")
 	ErrInvalidEmailFormat                    = ApiError("invalid email format")

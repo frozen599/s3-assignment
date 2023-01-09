@@ -43,7 +43,7 @@ func TestController_Block(t *testing.T) {
 				Requestor: "abc@gmail.com",
 				Target:    "def@gmail.com",
 			},
-			expResult: pkg.ErrCurrentUserIsBlockingTarget,
+			expResult: pkg.ErrCurrentUserIsBlockingTargetOrBlocked,
 		},
 	}
 

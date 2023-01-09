@@ -37,12 +37,12 @@ func (bc blockingController) Block(requestor string, target string) error {
 		return pkg.ErrUserNotFound
 	}
 
-	isBlockingTarget, err := bc.relaRepo.CheckIfIsBlockingTarget(requestorUser.ID, targetUser.ID)
+	isBlockingOrBlocked, err := bc.relaRepo.CheckIfIsBlockingOrBlocked(requestorUser.ID, targetUser.ID)
 	if err != nil {
 		return err
 	}
-	if isBlockingTarget {
-		return pkg.ErrCurrentUserIsBlockingTarget
+	if isBlockingOrBlocked {
+		return pkg.ErrCurrentUserIsBlockingTargetOrBlocked
 	}
 
 	blockingRelationShip := models.Relationship{

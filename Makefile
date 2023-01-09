@@ -2,7 +2,7 @@
 
 APP_NAME = apiserver
 BUILD_DIR = $(PWD)/build
-DATABASE_URL=postgres://postgres:password@0.0.0.0:5432/postgres?sslmode=disable
+DATABASE_URL=postgres://postgres:password@localhost:5432/postgres?sslmode=disable
 
 clean:
 	rm -rf ./build

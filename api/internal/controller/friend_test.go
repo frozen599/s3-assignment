@@ -45,7 +45,7 @@ func TestController_CreateFriend(t *testing.T) {
 			input: forms.CreateFriendRequest{
 				Friends: []string{"abc@gmail.com", "ghi@gmail.com"},
 			},
-			expResult: pkg.ErrCurrentUserIsBlockingTarget,
+			expResult: pkg.ErrCurrentUserIsBlockingTargetOrBlocked,
 		},
 	}
 

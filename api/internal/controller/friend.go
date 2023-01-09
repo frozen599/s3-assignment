@@ -47,12 +47,12 @@ func (fc friendController) CreateFriendConnection(firstUserEmail, secondUserEmai
 		return pkg.ErrFriendshipAlreadyExists
 	}
 
-	isBlockingTarget, err := fc.relaRepo.CheckIfIsBlockingTarget(firstUser.ID, secondUser.ID)
+	isBlockingOrBlocked, err := fc.relaRepo.CheckIfIsBlockingOrBlocked(firstUser.ID, secondUser.ID)
 	if err != nil {
 		return err
 	}
-	if isBlockingTarget {
-		return pkg.ErrCurrentUserIsBlockingTarget
+	if isBlockingOrBlocked {
+		return pkg.ErrCurrentUserIsBlockingTargetOrBlocked
 	}
 
 	friendRelationShip := models.Relationship{
@@ -78,14 +78,9 @@ func (fc friendController) GetFriendList(email string) ([]models.User, error) {
 		return nil, pkg.ErrUserNotFound
 	}
 
-	friendListRelationships, err := fc.relaRepo.GetFriendList(user.ID)
+	friendIDs, err := fc.relaRepo.GetFriendList(user.ID)
 	if err != nil {
 		return nil, err
-	}
-
-	var friendIDs []int
-	for _, friend := range friendListRelationships {
-		friendIDs = append(friendIDs, friend.UserID2)
 	}
 	friends, err := fc.userRepo.GetUserByIDs(friendIDs)
 	if err != nil {
@@ -116,16 +111,7 @@ func (fc friendController) GetMutualFriendList(firstUserEmail, secondUserEmail s
 		return nil, err
 	}
 
-	var firstUserIDs []int
-	for _, friend := range firstUserFriendList {
-		firstUserIDs = append(firstUserIDs, friend.UserID2)
-	}
-	var secondUserIDs []int
-	for _, friend := range secondUserFriendList {
-		secondUserIDs = append(secondUserIDs, friend.UserID2)
-	}
-
-	mutualFriendListIDs := pkg.GetMutualFriendList(firstUserIDs, secondUserIDs)
+	mutualFriendListIDs := pkg.GetMutualFriendList(firstUserFriendList, secondUserFriendList)
 	friends, err := fc.userRepo.GetUserByIDs(mutualFriendListIDs)
 	if err != nil {
 		return nil, err

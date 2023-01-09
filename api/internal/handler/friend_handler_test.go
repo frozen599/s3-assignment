@@ -23,10 +23,28 @@ func TestHandler_CreateFriend(t *testing.T) {
 		statusCode int
 	}{
 		"success": {
-			input:      "{\"friends\":[\"john@example.com\",\"andy\"]}",
+			input:      "{\"friends\":[\"abc@gmail.com\",\"def@gmail.com\"]}",
 			expBody:    "{\"success\":true}",
 			statusCode: http.StatusOK,
 			expErr:     nil,
+		},
+		"first user not exist": {
+			input:      "{\"friends\":[\"noexist@example.com\",\"def@gmail.com\"]}",
+			expBody:    "{\"message\":\"user not found\",\"success\":false}",
+			statusCode: http.StatusInternalServerError,
+			expErr:     pkg.ErrUserNotFound,
+		},
+		"second user not exist": {
+			input:      "{\"friends\":[\"abc@gmail.com\",\"noexist@gmail.com\"]}",
+			expBody:    "{\"message\":\"user not found\",\"success\":false}",
+			statusCode: http.StatusInternalServerError,
+			expErr:     pkg.ErrUserNotFound,
+		},
+		"is already friend": {
+			input:      "{\"friends\":[\"abc@gmail.com\",\"def@gmail.com\"]}",
+			expBody:    "{\"message\":\"friendship already exists\",\"success\":false}",
+			statusCode: http.StatusInternalServerError,
+			expErr:     pkg.ErrFriendshipAlreadyExists,
 		},
 	}
 
@@ -55,6 +73,7 @@ func TestHandler_CreateFriend(t *testing.T) {
 			handler.ServeHTTP(res, req)
 			if tc.expErr != nil {
 				require.Equal(t, tc.statusCode, res.Code)
+				require.Equal(t, tc.expBody, res.Body.String())
 			} else {
 				require.Equal(t, tc.expBody, res.Body.String())
 				require.Equal(t, tc.statusCode, res.Code)
@@ -72,10 +91,20 @@ func TestHandler_GetFriendList(t *testing.T) {
 		statusCode int
 	}{
 		"success": {
-			input:      "{\"email\":\"john@example.com\"}",
-			expBody:    "{\"success\":true}",
+			input:      "{\"email\":\"abc@gmail.com\"}",
+			expBody:    "{\"success\":true,\"friends\":[\"def@gmail.com\",\"ghi@gmail.com\"],\"count\":2}",
 			statusCode: http.StatusOK,
-			expErr:     pkg.ErrInvalidEmailFormat,
+			expErr:     nil,
+		},
+		"user not exist": {
+			input:      "{\"email\":\"john@gmail.com\"}",
+			expBody:    "{\"message\":\"user not found\",\"success\":false}",
+			statusCode: http.StatusInternalServerError,
+		},
+		"user does not have any friends": {
+			input:      "{\"email\":\"jkl@gmail.com\"}",
+			expBody:    "{\"success\":true,\"friends\":null,\"count\":0}",
+			statusCode: http.StatusOK,
 		},
 	}
 
@@ -83,7 +112,7 @@ func TestHandler_GetFriendList(t *testing.T) {
 	dbInstance := config.InitDB(cfg)
 	defer dbInstance.Close()
 
-	initData, err := ioutil.ReadFile("./test_data/init_data.sql")
+	initData, err := ioutil.ReadFile("./test_data/init_friend_data.sql")
 	require.NoError(t, err)
 	_, err = dbInstance.Exec(string(initData))
 	require.NoError(t, err)
@@ -104,6 +133,7 @@ func TestHandler_GetFriendList(t *testing.T) {
 			handler.ServeHTTP(res, req)
 			if tc.expErr != nil {
 				require.Equal(t, tc.statusCode, res.Code)
+				require.Equal(t, tc.expBody, res.Body.String())
 			} else {
 				require.Equal(t, tc.expBody, res.Body.String())
 				require.Equal(t, tc.statusCode, res.Code)
@@ -121,8 +151,26 @@ func TestHandler_GetMutualFriendList(t *testing.T) {
 		statusCode int
 	}{
 		"success": {
-			input:      "{\"friends\":[\"john@example.com\",\"abc@gmail.com\"]}",
-			expBody:    "{\"success\":true}",
+			input:      "{\"friends\":[\"def@gmail.com\",\"abc@gmail.com\"]}",
+			expBody:    "{\"success\":true,\"friends\":[\"ghi@gmail.com\"],\"count\":1}",
+			statusCode: http.StatusOK,
+			expErr:     nil,
+		},
+		"first user not exist": {
+			input:      "{\"friends\":[\"noexist@example.com\",\"def@gmail.com\"]}",
+			expBody:    "{\"message\":\"user not found\",\"success\":false}",
+			statusCode: http.StatusInternalServerError,
+			expErr:     pkg.ErrUserNotFound,
+		},
+		"second user not exist": {
+			input:      "{\"friends\":[\"abc@gmail.com\",\"noexist@gmail.com\"]}",
+			expBody:    "{\"message\":\"user not found\",\"success\":false}",
+			statusCode: http.StatusInternalServerError,
+			expErr:     pkg.ErrUserNotFound,
+		},
+		"two users do not have mutual friends": {
+			input:      "{\"friends\":[\"def@gmail.com\",\"jkl@gmail.com\"]}",
+			expBody:    "{\"success\":true,\"friends\":null,\"count\":0}",
 			statusCode: http.StatusOK,
 			expErr:     nil,
 		},
@@ -132,7 +180,7 @@ func TestHandler_GetMutualFriendList(t *testing.T) {
 	dbInstance := config.InitDB(cfg)
 	defer dbInstance.Close()
 
-	initData, err := ioutil.ReadFile("./test_data/init_data.sql")
+	initData, err := ioutil.ReadFile("./test_data/init_friend_data.sql")
 	require.NoError(t, err)
 	_, err = dbInstance.Exec(string(initData))
 	require.NoError(t, err)
