@@ -10,7 +10,7 @@ import (
 
 type SubscriberController interface {
 	CreateSubScription(requestor, target string) error
-	CanReceiveUpdate(sender string, mentionedEmails []string) ([]string, error)
+	GetCanReceiveUpdate(sender string, mentionedEmails []string) ([]string, error)
 }
 
 type subscriberController struct {
@@ -70,7 +70,7 @@ func (sc subscriberController) CreateSubScription(requestor, target string) erro
 
 }
 
-func (sc subscriberController) CanReceiveUpdate(sender string, mentionedEmails []string) ([]string, error) {
+func (sc subscriberController) GetCanReceiveUpdate(sender string, mentionedEmails []string) ([]string, error) {
 	senderUser, err := sc.userRepo.GetUserByEmail(sender)
 	if err != nil {
 		return nil, err

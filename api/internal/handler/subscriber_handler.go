@@ -54,7 +54,7 @@ func (h subscriberHandler) GetCanReceiveUpdate(w http.ResponseWriter, r *http.Re
 		return
 	}
 
-	emails, err := h.subscriberController.CanReceiveUpdate(req.Sender, mentionEmails)
+	emails, err := h.subscriberController.GetCanReceiveUpdate(req.Sender, mentionEmails)
 	if err != nil {
 		pkg.ResponseError(w, http.StatusInternalServerError, err)
 		return

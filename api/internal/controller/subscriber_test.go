@@ -105,7 +105,7 @@ func TestController_CanReceiveUpdate(t *testing.T) {
 			userRepo := repo.NewUserRepo(dbInstance)
 			relaRepo := repo.NewRelationshipRepo(dbInstance)
 			subscriberController := NewSubscriberController(userRepo, relaRepo)
-			recipients, err := subscriberController.CanReceiveUpdate(tc.input.Sender, []string{tc.input.Text})
+			recipients, err := subscriberController.GetCanReceiveUpdate(tc.input.Sender, []string{tc.input.Text})
 			if tc.expResult != nil {
 				require.Error(t, err)
 				require.Empty(t, recipients)
