@@ -12,7 +12,7 @@ type RelationshipRepo interface {
 	CheckIfFriendConnectionExists(userID, targetUserID int) (bool, error)
 	CheckIfAlreadySubscribing(userID, targetUserID int) (bool, error)
 	GetFollowers(userID int) ([]int, error)
-	GetNotBlockedOrBlockingList(targetID int, userIDs []int) ([]int, error)
+	GetBlockedOrBlockingList(targetID int, userIDs []int) ([]int, error)
 }
 
 type relationshipRepo struct {
@@ -110,7 +110,7 @@ func (r relationshipRepo) GetFollowers(userID int) ([]int, error) {
 	return ret, err
 }
 
-func (r relationshipRepo) GetNotBlockedOrBlockingList(targetID int, userIDs []int) ([]int, error) {
+func (r relationshipRepo) GetBlockedOrBlockingList(targetID int, userIDs []int) ([]int, error) {
 	var ret []int
 	sql :=
 		`

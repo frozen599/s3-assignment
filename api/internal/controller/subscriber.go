@@ -96,13 +96,16 @@ func (sc subscriberController) GetCanReceiveUpdate(sender string, mentionedEmail
 		if err != nil {
 			return nil, err
 		}
-		notBlockingOrBlockedList, err := sc.relaRepo.GetNotBlockedOrBlockingList(senderUser.ID, mentionedIDs)
+		blockingOrBlockedList, err := sc.relaRepo.GetBlockedOrBlockingList(senderUser.ID, mentionedIDs)
 		if err != nil {
 			return nil, err
 		}
+		notBlockingOrBlockedList := pkg.FindDiff(mentionedIDs, blockingOrBlockedList)
 
-		tempIDs := append(followerIDs, notBlockingOrBlockedList...)
+		var tempIDs []int
 		tempIDs = append(tempIDs, friendIDs...)
+		tempIDs = append(tempIDs, followerIDs...)
+		tempIDs = append(tempIDs, notBlockingOrBlockedList...)
 		userIDs := pkg.RemoveDuplicateIDs(tempIDs)
 		users, err := sc.userRepo.GetUserByIDs(userIDs)
 		if err != nil {

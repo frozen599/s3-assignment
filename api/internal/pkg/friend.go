@@ -25,3 +25,23 @@ func RemoveDuplicateIDs(ids []int) []int {
 	}
 	return list
 }
+
+func contain(item int, slice []int) bool {
+	for _, elem := range slice {
+		if elem == item {
+			return true
+		}
+	}
+	return false
+}
+
+func FindDiff(slice1, slice2 []int) []int {
+	var ret []int
+	for _, item1 := range slice1 {
+		contained := contain(item1, slice2)
+		if !contained {
+			ret = append(ret, item1)
+		}
+	}
+	return ret
+}
