@@ -76,11 +76,14 @@ func (sc subscriberController) GetCanReceiveUpdate(sender string, mentionedEmail
 		return nil, err
 	}
 
-	var mentionedUsers []models.User
+	var mentionedIDs []int
 	if len(mentionedEmails) > 0 {
-		mentionedUsers, err = sc.userRepo.GetUserByEmails(mentionedEmails)
+		mentionedUsers, err := sc.userRepo.GetUserByEmails(mentionedEmails)
 		if err != nil {
 			return nil, err
+		}
+		for _, mentionedUser := range mentionedUsers {
+			mentionedIDs = append(mentionedIDs, mentionedUser.ID)
 		}
 	}
 
@@ -93,19 +96,22 @@ func (sc subscriberController) GetCanReceiveUpdate(sender string, mentionedEmail
 		if err != nil {
 			return nil, err
 		}
-		userIDs := pkg.RemoveDuplicateIDs(append(followerIDs, friendIDs...))
+		notBlockingOrBlockedList, err := sc.relaRepo.GetNotBlockedOrBlockingList(senderUser.ID, mentionedIDs)
+		if err != nil {
+			return nil, err
+		}
+
+		tempIDs := append(followerIDs, notBlockingOrBlockedList...)
+		tempIDs = append(tempIDs, friendIDs...)
+		userIDs := pkg.RemoveDuplicateIDs(tempIDs)
 		users, err := sc.userRepo.GetUserByIDs(userIDs)
 		if err != nil {
 			return nil, err
 		}
+
 		var emails []string
 		for _, user := range users {
 			emails = append(emails, user.Email)
-		}
-		if len(mentionedUsers) > 0 {
-			for _, user := range mentionedUsers {
-				emails = append(emails, user.Email)
-			}
 		}
 		return emails, nil
 	}

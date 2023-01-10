@@ -12,6 +12,7 @@ type RelationshipRepo interface {
 	CheckIfFriendConnectionExists(userID, targetUserID int) (bool, error)
 	CheckIfAlreadySubscribing(userID, targetUserID int) (bool, error)
 	GetFollowers(userID int) ([]int, error)
+	GetNotBlockedOrBlockingList(targetID int, userIDs []int) ([]int, error)
 }
 
 type relationshipRepo struct {
@@ -103,6 +104,27 @@ func (r relationshipRepo) GetFollowers(userID int) ([]int, error) {
 		AND relationship_type = ?
 	`
 	_, err := r.db.Query(&ret, sql, userID, models.RelationshipTypeSubscriber)
+	if err == pg.ErrNoRows {
+		return nil, nil
+	}
+	return ret, err
+}
+
+func (r relationshipRepo) GetNotBlockedOrBlockingList(targetID int, userIDs []int) ([]int, error) {
+	var ret []int
+	sql :=
+		`
+	SELECT user_id_1
+	FROM relationships
+	WHERE user_id_2 = ?
+		AND relationship_type = 'blocking'
+	UNION
+	SELECT user_id_2
+	FROM relationships
+	WHERE user_id_1 = ?
+		AND relationship_type = 'blocking'
+	`
+	_, err := r.db.Query(&ret, sql, targetID, targetID)
 	if err == pg.ErrNoRows {
 		return nil, nil
 	}
