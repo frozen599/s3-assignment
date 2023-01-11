@@ -2,7 +2,7 @@ package pkg
 
 import (
 	"encoding/json"
-	"log"
+	"fmt"
 	"net/http"
 
 	"github.com/frozen599/s3-assignment/api/internal/forms"
@@ -16,7 +16,7 @@ func ResponseOk(w http.ResponseWriter) {
 	}
 	respData, err := json.Marshal(&successResp)
 	if err != nil {
-		log.Fatal(err)
+		fmt.Println(err)
 	}
 	w.Write(respData)
 }
@@ -29,7 +29,7 @@ func ResponseError(w http.ResponseWriter, code int, err error) {
 	resp["message"] = err.Error()
 	respData, err := json.Marshal(resp)
 	if err != nil {
-		log.Fatal(err)
+		fmt.Println(err)
 	}
 	w.Write(respData)
 }
