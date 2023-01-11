@@ -45,3 +45,17 @@ func FindDiff(slice1, slice2 []int) []int {
 	}
 	return ret
 }
+
+func ConcatIntSlices(slices ...[]int) []int {
+	var totalLen int
+	for _, s := range slices {
+		totalLen += len(s)
+	}
+	result := make([]int, totalLen)
+
+	var i int
+	for _, s := range slices {
+		i += copy(result[i:], s)
+	}
+	return result
+}

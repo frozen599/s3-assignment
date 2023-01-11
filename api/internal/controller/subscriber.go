@@ -63,11 +63,7 @@ func (sc subscriberController) CreateSubScription(requestor, target string) erro
 	}
 
 	err = sc.relaRepo.CreateRelationship(blockingRelationShip)
-	if err != nil {
-		return err
-	}
-	return nil
-
+	return err
 }
 
 func (sc subscriberController) GetCanReceiveUpdate(sender string, mentionedEmails []string) ([]string, error) {
@@ -102,16 +98,12 @@ func (sc subscriberController) GetCanReceiveUpdate(sender string, mentionedEmail
 		}
 		notBlockingOrBlockedList := pkg.FindDiff(mentionedIDs, blockingOrBlockedList)
 
-		var tempIDs []int
-		tempIDs = append(tempIDs, friendIDs...)
-		tempIDs = append(tempIDs, followerIDs...)
-		tempIDs = append(tempIDs, notBlockingOrBlockedList...)
+		tempIDs := pkg.ConcatIntSlices(followerIDs, friendIDs, notBlockingOrBlockedList)
 		userIDs := pkg.RemoveDuplicateIDs(tempIDs)
 		users, err := sc.userRepo.GetUserByIDs(userIDs)
 		if err != nil {
 			return nil, err
 		}
-
 		var emails []string
 		for _, user := range users {
 			emails = append(emails, user.Email)
