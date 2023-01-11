@@ -2,7 +2,6 @@ package pkg
 
 import (
 	"encoding/json"
-	"fmt"
 	"log"
 	"net/http"
 
@@ -18,8 +17,6 @@ func ResponseOk(w http.ResponseWriter) {
 	respData, err := json.Marshal(&successResp)
 	if err != nil {
 		log.Fatal(err)
-		fmt.Fprintln(w, nil)
-		return
 	}
 	w.Write(respData)
 }
@@ -33,8 +30,6 @@ func ResponseError(w http.ResponseWriter, code int, err error) {
 	respData, err := json.Marshal(resp)
 	if err != nil {
 		log.Fatal(err)
-		fmt.Fprintln(w, nil)
-		return
 	}
 	w.Write(respData)
 }
