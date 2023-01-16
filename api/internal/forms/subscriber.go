@@ -6,7 +6,7 @@ type SubscribeToEmailRequest struct {
 }
 
 type CanReceiveUpdateRequest struct {
-	Sender string `json:"email"`
+	Sender string `json:"sender"`
 	Text   string `json:"text"`
 }
 

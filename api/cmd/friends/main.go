@@ -10,8 +10,10 @@ import (
 )
 
 func main() {
-	cfg := config.NewConfig()
+	cfg := config.NewConfig("./../../..")
+	log.Println(cfg)
 	db := config.InitDB(cfg)
+	log.Println(db == nil)
 	if db == nil {
 		log.Fatal("cannot establish connection to db")
 	}

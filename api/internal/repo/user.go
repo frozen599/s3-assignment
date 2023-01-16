@@ -8,6 +8,7 @@ import (
 type UserRepo interface {
 	GetUserByEmail(email string) (*models.User, error)
 	GetUserByIDs(ids []int) ([]models.User, error)
+	GetUserByEmails(emails []string) ([]models.User, error)
 }
 
 type userRepo struct {
@@ -23,6 +24,7 @@ func (r userRepo) GetUserByEmail(email string) (*models.User, error) {
 	err := r.db.
 		Model(&ret).
 		Where("email = ?", email).
+		Limit(1).
 		Select()
 	if err == pg.ErrNoRows {
 		return nil, nil
@@ -41,4 +43,16 @@ func (r userRepo) GetUserByIDs(ids []int) ([]models.User, error) {
 		return nil, nil
 	}
 	return ret, nil
+}
+
+func (r userRepo) GetUserByEmails(emails []string) ([]models.User, error) {
+	var ret []models.User
+	err := r.db.
+		Model(&ret).
+		Where("email IN (?)", pg.In(emails)).
+		Select()
+	if err == pg.ErrNoRows {
+		return nil, nil
+	}
+	return ret, err
 }

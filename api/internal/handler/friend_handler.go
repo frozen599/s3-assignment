@@ -2,7 +2,6 @@ package handler
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 
 	"github.com/frozen599/s3-assignment/api/internal/controller"
@@ -22,19 +21,19 @@ func (h friendHandler) CreateFriendConnection(w http.ResponseWriter, r *http.Req
 	var req forms.CreateFriendRequest
 	err := json.NewDecoder(r.Body).Decode(&req)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		pkg.ResponseError(w, http.StatusBadRequest, pkg.ErrRequestBodyMalformed)
 		return
 	}
 
 	isValidInput := pkg.ValidateEmailInput([]string{req.Friends[0], req.Friends[1]})
 	if !isValidInput {
-		pkg.ResponseError(w, 103, pkg.ErrInvalidEmailFormat)
+		pkg.ResponseError(w, http.StatusBadRequest, pkg.ErrInvalidEmailFormat)
 		return
 	}
 
 	err = h.friendController.CreateFriendConnection(req.Friends[0], req.Friends[1])
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		pkg.ResponseError(w, http.StatusInternalServerError, err)
 		return
 	}
 	pkg.ResponseOk(w)
@@ -44,13 +43,13 @@ func (h friendHandler) GetFriendList(w http.ResponseWriter, r *http.Request) {
 	var req forms.FriendListRequest
 	err := json.NewDecoder(r.Body).Decode(&req)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		pkg.ResponseError(w, http.StatusBadRequest, pkg.ErrRequestBodyMalformed)
 		return
 	}
 
 	isValidInput := pkg.ValidateEmailInput([]string{req.Email})
 	if !isValidInput {
-		pkg.ResponseError(w, 103, pkg.ErrInvalidEmailFormat)
+		pkg.ResponseError(w, http.StatusBadRequest, pkg.ErrInvalidEmailFormat)
 		return
 	}
 
@@ -78,20 +77,20 @@ func (h friendHandler) GetFriendList(w http.ResponseWriter, r *http.Request) {
 	}
 	w.WriteHeader(http.StatusOK)
 	w.Header().Set("Content-Type", "application/json")
-	fmt.Fprintln(w, respData)
+	w.Write(respData)
 }
 
 func (h friendHandler) GetMutualFriendList(w http.ResponseWriter, r *http.Request) {
 	var req forms.MutualFriendListRequest
 	err := json.NewDecoder(r.Body).Decode(&req)
 	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
+		pkg.ResponseError(w, http.StatusBadRequest, pkg.ErrRequestBodyMalformed)
 		return
 	}
 
 	isValidInput := pkg.ValidateEmailInput([]string{req.Friends[0], req.Friends[1]})
 	if !isValidInput {
-		pkg.ResponseError(w, 103, pkg.ErrInvalidEmailFormat)
+		pkg.ResponseError(w, http.StatusBadRequest, pkg.ErrInvalidEmailFormat)
 		return
 	}
 
@@ -119,5 +118,5 @@ func (h friendHandler) GetMutualFriendList(w http.ResponseWriter, r *http.Reques
 	}
 	w.WriteHeader(http.StatusOK)
 	w.Header().Set("Content-Type", "application/json")
-	fmt.Fprintln(w, respData)
+	w.Write(respData)
 }

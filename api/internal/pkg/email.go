@@ -1,6 +1,7 @@
 package pkg
 
 import (
+	"net/mail"
 	"regexp"
 )
 
@@ -17,14 +18,21 @@ func match(text string, regex *regexp.Regexp) []string {
 	return p
 }
 
-func ParseEmail(text string) []string {
+func ExtractEmail(text string) []string {
 	return match(text, emailRegex)
 }
 
+func validMailAddress(address string) bool {
+	_, err := mail.ParseAddress(address)
+	return err == nil
+}
+
 func ValidateEmailInput(emails []string) bool {
-	emailStr := ""
 	for _, email := range emails {
-		emailStr += email + " "
+		isValid := validMailAddress(email)
+		if !isValid {
+			return false
+		}
 	}
-	return len(ParseEmail(emailStr)) == len(emails)
+	return true
 }

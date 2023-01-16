@@ -10,7 +10,7 @@ import (
 
 type SubscriberController interface {
 	CreateSubScription(requestor, target string) error
-	CanReceiveUpdate(sender, text string) ([]string, error)
+	GetCanReceiveUpdate(sender string, mentionedEmails []string) ([]string, error)
 }
 
 type subscriberController struct {
@@ -34,46 +34,72 @@ func (sc subscriberController) CreateSubScription(requestor, target string) erro
 	if err != nil {
 		return err
 	}
-
-	if requestorUser != nil && targetUser != nil {
-		blockingRelationShip := models.Relationship{
-			UserID1:          requestorUser.ID,
-			UserID2:          targetUser.ID,
-			RelationshipType: models.RelationshipTypeSubscriber,
-			CreatedAt:        time.Now(),
-			UpdatedAt:        time.Now(),
-		}
-
-		err = sc.relaRepo.CreateRelationship(blockingRelationShip)
-		if err != nil {
-			return err
-		}
-		return nil
+	if requestorUser == nil || targetUser == nil {
+		return pkg.ErrUserNotFound
 	}
-	return pkg.ErrUserNotFound
+
+	isAlreadySubscribing, err := sc.relaRepo.CheckIfAlreadySubscribing(requestorUser.ID, targetUser.ID)
+	if err != nil {
+		return err
+	}
+	if isAlreadySubscribing {
+		return pkg.ErrCurrentUserIsAlreadySubscribingTarget
+	}
+
+	isBlockingOrBlocked, err := sc.relaRepo.CheckIfIsBlockingOrBlocked(requestorUser.ID, targetUser.ID)
+	if err != nil {
+		return err
+	}
+	if isBlockingOrBlocked {
+		return pkg.ErrCurrentUserIsBlockingTargetOrBlocked
+	}
+
+	blockingRelationShip := models.Relationship{
+		UserID1:          requestorUser.ID,
+		UserID2:          targetUser.ID,
+		RelationshipType: models.RelationshipTypeSubscriber,
+		CreatedAt:        time.Now(),
+		UpdatedAt:        time.Now(),
+	}
+
+	err = sc.relaRepo.CreateRelationship(blockingRelationShip)
+	return err
 }
 
-func (sc subscriberController) CanReceiveUpdate(sender, text string) ([]string, error) {
+func (sc subscriberController) GetCanReceiveUpdate(sender string, mentionedEmails []string) ([]string, error) {
 	senderUser, err := sc.userRepo.GetUserByEmail(sender)
 	if err != nil {
 		return nil, err
 	}
 
-	mentionedEmail := pkg.ParseEmail(text)[0]
-	mentionedUser, err := sc.userRepo.GetUserByEmail(mentionedEmail)
-	if err != nil {
-		return nil, err
-	}
-
-	if senderUser != nil {
-		relas, err := sc.relaRepo.CanReceiveUpdate(senderUser.ID)
+	var mentionedIDs []int
+	if len(mentionedEmails) > 0 {
+		mentionedUsers, err := sc.userRepo.GetUserByEmails(mentionedEmails)
 		if err != nil {
 			return nil, err
 		}
-		var userIDs []int
-		for _, rela := range relas {
-			userIDs = append(userIDs, rela.UserID2)
+		for _, mentionedUser := range mentionedUsers {
+			mentionedIDs = append(mentionedIDs, mentionedUser.ID)
 		}
+	}
+
+	if senderUser != nil {
+		followerIDs, err := sc.relaRepo.GetFollowers(senderUser.ID)
+		if err != nil {
+			return nil, err
+		}
+		friendIDs, err := sc.relaRepo.GetFriendList(senderUser.ID)
+		if err != nil {
+			return nil, err
+		}
+		blockingOrBlockedList, err := sc.relaRepo.GetBlockedOrBlockingList(senderUser.ID, mentionedIDs)
+		if err != nil {
+			return nil, err
+		}
+		notBlockingOrBlockedList := pkg.FindDiff(mentionedIDs, blockingOrBlockedList)
+
+		tempIDs := pkg.ConcatIntSlices(followerIDs, friendIDs, notBlockingOrBlockedList)
+		userIDs := pkg.RemoveDuplicateIDs(tempIDs)
 		users, err := sc.userRepo.GetUserByIDs(userIDs)
 		if err != nil {
 			return nil, err
@@ -81,9 +107,6 @@ func (sc subscriberController) CanReceiveUpdate(sender, text string) ([]string, 
 		var emails []string
 		for _, user := range users {
 			emails = append(emails, user.Email)
-		}
-		if mentionedUser != nil {
-			emails = append(emails, mentionedUser.Email)
 		}
 		return emails, nil
 	}

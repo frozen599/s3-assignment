@@ -33,15 +33,10 @@ var (
 )
 
 // NewConfig function to prepare config variables from .env file and return config.
-func NewConfig() *Config {
+func NewConfig(path string) *Config {
 	// Configuring config one time.
 	once.Do(func() {
-		curDir, err := os.Getwd()
-		if err != nil {
-			log.Fatal("cannot load current directory")
-		}
-
-		err = godotenv.Load(curDir + "/.env")
+		err := godotenv.Load(path + "/.env")
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -95,7 +90,6 @@ func NewConfig() *Config {
 		}
 
 	})
-	// Return configured config instance.
 	return instance
 }
 
@@ -106,7 +100,9 @@ func InitDB(cfg *Config) *pg.DB {
 		Database: cfg.DBName,
 		Addr:     fmt.Sprintf("%s:%d", cfg.DBHost, cfg.DBPort),
 	})
+
 	if dbInstance != nil {
+		log.Println("cccccc")
 		ctx := context.Background()
 		err := dbInstance.Ping(ctx)
 		if err != nil {

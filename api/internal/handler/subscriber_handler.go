@@ -2,7 +2,6 @@ package handler
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 
 	"github.com/frozen599/s3-assignment/api/internal/controller"
@@ -22,38 +21,40 @@ func (h subscriberHandler) CreateSubscription(w http.ResponseWriter, r *http.Req
 	var req forms.SubscribeToEmailRequest
 	err := json.NewDecoder(r.Body).Decode(&req)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		pkg.ResponseError(w, http.StatusBadRequest, pkg.ErrRequestBodyMalformed)
 		return
 	}
 
 	isValidInput := pkg.ValidateEmailInput([]string{req.Requestor, req.Target})
 	if !isValidInput {
-		pkg.ResponseError(w, 103, pkg.ErrInvalidEmailFormat)
+		pkg.ResponseError(w, http.StatusBadRequest, pkg.ErrInvalidEmailFormat)
 		return
 	}
 
 	err = h.subscriberController.CreateSubScription(req.Requestor, req.Target)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		pkg.ResponseError(w, http.StatusInternalServerError, err)
 		return
 	}
 	pkg.ResponseOk(w)
 }
 
-func (h subscriberHandler) CanReceiveUpdate(w http.ResponseWriter, r *http.Request) {
+func (h subscriberHandler) GetCanReceiveUpdate(w http.ResponseWriter, r *http.Request) {
 	var req forms.CanReceiveUpdateRequest
 	err := json.NewDecoder(r.Body).Decode(&req)
 	if err != nil {
-		pkg.ResponseError(w, http.StatusBadRequest, err)
-		return
-	}
-	isValidInput := pkg.ValidateEmailInput([]string{req.Sender})
-	if !isValidInput {
-		pkg.ResponseError(w, 103, pkg.ErrInvalidEmailFormat)
+		pkg.ResponseError(w, http.StatusBadRequest, pkg.ErrRequestBodyMalformed)
 		return
 	}
 
-	emails, err := h.subscriberController.CanReceiveUpdate(req.Sender, req.Text)
+	mentionEmails := pkg.ExtractEmail(req.Text)
+	isValidInput := pkg.ValidateEmailInput(append(mentionEmails, req.Sender))
+	if !isValidInput {
+		pkg.ResponseError(w, http.StatusBadRequest, pkg.ErrInvalidEmailFormat)
+		return
+	}
+
+	emails, err := h.subscriberController.GetCanReceiveUpdate(req.Sender, mentionEmails)
 	if err != nil {
 		pkg.ResponseError(w, http.StatusInternalServerError, err)
 		return
@@ -72,5 +73,5 @@ func (h subscriberHandler) CanReceiveUpdate(w http.ResponseWriter, r *http.Reque
 	}
 	w.WriteHeader(http.StatusOK)
 	w.Header().Set("Content-Type", "application/json")
-	fmt.Fprintln(w, respData)
+	w.Write(respData)
 }

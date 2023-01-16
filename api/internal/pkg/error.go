@@ -1,26 +1,16 @@
 package pkg
 
-import "fmt"
-
-type ApiError struct {
-	Code    int    `json:"code"`
-	Message string `json:"message"`
-}
-
-func NewApiError(code int, message string) ApiError {
-	return ApiError{
-		Code:    code,
-		Message: message,
-	}
-}
+type ApiError string
 
 func (e ApiError) Error() string {
-	return fmt.Sprintf("code: %d - message: %s", e.Code, e.Message)
+	return string(e)
 }
 
 var (
-	ErrFriendshipAlreadyExists     = NewApiError(100, "friendship already exists")
-	ErrCurrentUserIsBlockingTarget = NewApiError(101, "requestor is blocking target")
-	ErrUserNotFound                = NewApiError(102, "user not found")
-	ErrInvalidEmailFormat          = NewApiError(103, "invalid email format")
+	ErrFriendshipAlreadyExists               = ApiError("friendship already exists")
+	ErrCurrentUserIsBlockingTargetOrBlocked  = ApiError("requestor is blocking target or being blocked")
+	ErrCurrentUserIsAlreadySubscribingTarget = ApiError("requestor is already subscribing target")
+	ErrUserNotFound                          = ApiError("user not found")
+	ErrInvalidEmailFormat                    = ApiError("invalid email format")
+	ErrRequestBodyMalformed                  = ApiError("request body is malformed")
 )

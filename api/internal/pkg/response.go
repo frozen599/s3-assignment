@@ -3,7 +3,6 @@ package pkg
 import (
 	"encoding/json"
 	"fmt"
-	"log"
 	"net/http"
 
 	"github.com/frozen599/s3-assignment/api/internal/forms"
@@ -17,11 +16,11 @@ func ResponseOk(w http.ResponseWriter) {
 	}
 	respData, err := json.Marshal(&successResp)
 	if err != nil {
-		log.Fatal(err)
-		fmt.Fprintln(w, nil)
+		fmt.Println(err)
+		w.Write([]byte(err.Error()))
 		return
 	}
-	fmt.Fprintln(w, respData)
+	w.Write(respData)
 }
 
 func ResponseError(w http.ResponseWriter, code int, err error) {
@@ -30,13 +29,11 @@ func ResponseError(w http.ResponseWriter, code int, err error) {
 	resp := make(map[string]interface{})
 	resp["success"] = false
 	resp["message"] = err.Error()
-	if code == http.StatusInternalServerError {
-		resp["message"] = "INTERNAL SERVER ERROR"
-	}
 	respData, err := json.Marshal(resp)
 	if err != nil {
-		log.Fatal(err)
-		fmt.Fprintln(w, nil)
+		fmt.Println(err)
+		w.Write([]byte(err.Error()))
+		return
 	}
-	fmt.Fprintln(w, respData)
+	w.Write(respData)
 }
